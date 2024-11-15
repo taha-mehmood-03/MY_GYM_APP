@@ -1,0 +1,125 @@
+{
+  "bodyparts": [
+    "/imagesofbodyparts/imagesofbodyParts/back.webp",
+    "/imagesofbodyparts/imagesofbodyParts/cardio.webp",
+    "/imagesofbodyparts/imagesofbodyParts/chest.webp",
+    "/imagesofbodyparts/imagesofbodyParts/lower arms.webp",
+    "/imagesofbodyparts/imagesofbodyParts/lower legs.webp",
+    "/imagesofbodyparts/imagesofbodyParts/neck.webp",
+    "/imagesofbodyparts/imagesofbodyParts/shoulder.webp",
+    "/imagesofbodyparts/imagesofbodyParts/upper arms.webp",
+    "/imagesofbodyparts/imagesofbodyParts/upper legs.webp",
+    "/imagesofbodyparts/imagesofbodyParts/waist.webp"
+  ],
+  "back": [
+    "/imagesofbodyparts/back/archerpullup.webp",
+    "/imagesofbodyparts/back/assistedpull-up.webp",
+    "/imagesofbodyparts/back/backlever.webp",
+    "/imagesofbodyparts/back/assistedparallelclosegrippull-up.webp",
+    "/imagesofbodyparts/back/backextensiononexerciseball.webp",
+    "/imagesofbodyparts/back/alternatelateralpulldown.webp",
+    "/imagesofbodyparts/back/assistedstandingpull-up.webp",
+    "/imagesofbodyparts/back/bandassistedpull-up.webp",
+    "/imagesofbodyparts/back/assistedstandingchin-up.webp",
+    "/imagesofbodyparts/back/backpecstretch.webp"
+  ],
+  "cardio": [
+    "/imagesofbodyparts/cardio/astridejumps(male).webp",
+    "/imagesofbodyparts/cardio/backandforthstep.webp",
+    "/imagesofbodyparts/cardio/bearcrawl.webp",
+    "/imagesofbodyparts/cardio/burpee.webp",
+    "/imagesofbodyparts/cardio/cyclecrosstrainer.webp",
+    "/imagesofbodyparts/cardio/dumbbellburpee.webp",
+    "/imagesofbodyparts/cardio/halfkneebends(male).webp",
+    "/imagesofbodyparts/cardio/highkneeagainstwall.webp",
+    "/imagesofbodyparts/cardio/jackburpee.webp",
+    "/imagesofbodyparts/cardio/jackjump(male).webp"
+  ],
+  "chest": [
+    "/imagesofbodyparts/chest/archerpushup.webp",
+    "/imagesofbodyparts/chest/assistedchestdip(kneeling).webp",
+    "/imagesofbodyparts/chest/assistedseatedpectoralismajorstretchwithstabilityball.webp",
+    "/imagesofbodyparts/chest/bandbenchpress.webp",
+    "/imagesofbodyparts/chest/bandonearmtwistingchestpress.webp",
+    "/imagesofbodyparts/chest/barbellbenchpress.webp",
+    "/imagesofbodyparts/chest/barbelldeclinebenchpress.webp",
+    "/imagesofbodyparts/chest/barbelldeclinepullover.webp",
+    "/imagesofbodyparts/chest/barbelldeclinewide-grippress.webp"
+  ],
+  "lowerarms": [
+    "/imagesofbodyparts/lowerarms/bandreversewristcurl.webp",
+    "/imagesofbodyparts/lowerarms/bandwristcurl.webp",
+    "/imagesofbodyparts/lowerarms/barbellpalmsdownwristcurloverabench.webp",
+    "/imagesofbodyparts/lowerarms/barbellpalmsupwristcurloverabench.webp",
+    "/imagesofbodyparts/lowerarms/barbellreversewristcurl.webp",
+    "/imagesofbodyparts/lowerarms/barbellreverswristcurlv.2.webp",
+    "/imagesofbodyparts/lowerarms/barbellstandingbackwristcurl.webp",
+    "/imagesofbodyparts/lowerarms/barbellwristcurl.webp",
+    "/imagesofbodyparts/lowerarms/barbellwristcurlv.2.webp",
+    "/imagesofbodyparts/lowerarms/cablereversewristcurl.webp"
+  ],
+  "lowerlegs": [
+    "/imagesofbodyparts/lowerlegs/anklecircles.webp",
+    "/imagesofbodyparts/lowerlegs/assistedlyingcalvesstretch.webp",
+    "/imagesofbodyparts/lowerlegs/bandsinglelegreversecalfraise.webp",
+    "/imagesofbodyparts/lowerlegs/bandtwolegscalfraise-(bandunderbothlegs)v.2.webp",
+    "/imagesofbodyparts/lowerlegs/barbellfloorcalfraise.webp",
+    "/imagesofbodyparts/lowerlegs/barbellseatedcalfraise.webp",
+    "/imagesofbodyparts/lowerlegs/barbellseatedcalfraise.webp",
+    "/imagesofbodyparts/lowerlegs/barbellstandingcalfraise.webp",
+    "/imagesofbodyparts/lowerlegs/barbellstandinglegcalfraise.webp",
+    "/imagesofbodyparts/lowerlegs/bandsinglelegcalfraise.webp"
+  ],
+  "neck": [
+    "/imagesofbodyparts/neck/necksidestretch.webp",
+    "/imagesofbodyparts/neck/sidepushneckstretch.webp"
+  ],
+  "shoulders": [
+    "/imagesofbodyparts/shoulders/bandy-raise.webp",
+    "/imagesofbodyparts/shoulders/bandfrontlateralraise.webp",
+    "/imagesofbodyparts/shoulders/bandfrontraise.webp",
+    "/imagesofbodyparts/shoulders/bandreversefly.webp",
+    "/imagesofbodyparts/shoulders/bandshoulderpress.webp",
+    "/imagesofbodyparts/shoulders/bandstandingreardeltrow.webp",
+    "/imagesofbodyparts/shoulders/bandtwistingoverheadpress.webp",
+    "/imagesofbodyparts/shoulders/barbellfrontraise.webp",
+    "/imagesofbodyparts/shoulders/barbellonearmsnatch.webp",
+    "/imagesofbodyparts/shoulders/barbellreardeltraise.webp"
+  ],
+  "upperarms": [
+    "/imagesofbodyparts/upperarms/assistedstandingtricepsextension(withtowel).webp",
+    "/imagesofbodyparts/upperarms/assistedtricepsdip(kneeling).webp",
+    "/imagesofbodyparts/upperarms/bandalternatingbicepscurl.webp",
+    "/imagesofbodyparts/upperarms/bandclose-grippush-up.webp",
+    "/imagesofbodyparts/upperarms/bandconcentrationcurl.webp",
+    "/imagesofbodyparts/upperarms/bandonearmoverheadbicepscurl.webp",
+    "/imagesofbodyparts/upperarms/bandsidetricepsextension.webp",
+    "/imagesofbodyparts/upperarms/barbellalternatebicepscurl.webp",
+    "/imagesofbodyparts/upperarms/barbellbicepscurl(witharmblaster).webp",
+    "/imagesofbodyparts/upperarms/barbellclose-gripbenchpress.webp"
+  ],
+  "upperlegs": [
+    "/imagesofbodyparts/upperlegs/allfourssquadstretch.webp",
+    "/imagesofbodyparts/upperlegs/armsapartcirculartoetouch(male).webp",
+    "/imagesofbodyparts/upperlegs/assistedlyingglutesstretch.webp",
+    "/imagesofbodyparts/upperlegs/assistedlyinggluteusandpiriformisstretch.webp",
+    "/imagesofbodyparts/upperlegs/assistedpronehamstring.webp",
+    "/imagesofbodyparts/upperlegs/assistedpronelyingquadsstretch.webp",
+    "/imagesofbodyparts/upperlegs/assistedsidelyingadductorstretch.webp",
+    "/imagesofbodyparts/upperlegs/backwardjump.webp",
+    "/imagesofbodyparts/upperlegs/balanceboard.webp",
+    "/imagesofbodyparts/upperlegs/bandbent-overhipextension.webp"
+  ],
+  "waist": [
+    "/imagesofbodyparts/waist/34sit-up.webp",
+    "/imagesofbodyparts/waist/45°sidebend.webp",
+    "/imagesofbodyparts/waist/airbike.webp",
+    "/imagesofbodyparts/waist/alternateheeltouchers.webp",
+    "/imagesofbodyparts/waist/armslingershangingbentkneelegs.webp",
+    "/imagesofbodyparts/waist/armslingershangingstraightlegs.webp",
+    "/imagesofbodyparts/waist/armsoverheadfullsit-up(male).webp",
+    "/imagesofbodyparts/waist/assistedhangingkneeraise.webp",
+    "/imagesofbodyparts/waist/assistedhangingkneeraisewiththrowdown.webp",
+    "/imagesofbodyparts/waist/assistedlyinglegraisewithlateralthrowdown.webp"
+  ]
+}
