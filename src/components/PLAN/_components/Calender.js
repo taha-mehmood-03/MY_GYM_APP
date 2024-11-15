@@ -152,6 +152,9 @@ const Calendar = React.memo(
   }
 );
 
+// Set the display name manually
+Calendar.displayName = 'Calendar';
+
 const CalendarWithSuspense = ({ ...props }) => (
   <React.Suspense
     fallback={

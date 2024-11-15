@@ -9,9 +9,12 @@ import { useDispatch } from "react-redux";
 import { fetchExercises } from "@/store/exerciseSlice";
 import Image from "next/image";
 
-// Dynamic imports using React.lazy
+// Dynamic imports using React.lazy with displayName
 const ExercisePopover = React.lazy(() => import("./_components/ExercisePopover"));
+ExercisePopover.displayName = "ExercisePopover";
+
 const Calender = React.lazy(() => import("./_components/Calender"));
+Calender.displayName = "Calender";
 
 const exercisesList = [
   "Upper Arms",
@@ -81,22 +84,23 @@ const AppointmentCard = React.memo(({ appointment, bodyimageMap, onDelete, onCar
             </span>
           </div>
         </div>
-        
-          <button
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-red-600 hover:bg-red-700 text-white transition-all duration-300"
-            aria-label="Delete Exercise"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(appointment._id);
-            }}
-          >
-            <AiOutlineDelete size={20} />
-          </button>
-       
+
+        <button
+          className="flex items-center justify-center w-10 h-10 rounded-full bg-red-600 hover:bg-red-700 text-white transition-all duration-300"
+          aria-label="Delete Exercise"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(appointment._id);
+          }}
+        >
+          <AiOutlineDelete size={20} />
+        </button>
       </div>
     </div>
   );
 });
+
+AppointmentCard.displayName = "AppointmentCard"; // Explicit displayName for memoized component
 
 const AppointmentCardSkeleton = () => (
   <div className="bg-gradient-to-br from-indigo-900 to-violet-900 p-6 rounded-lg shadow-md w-full border animate-pulse">
@@ -228,5 +232,5 @@ const Plan = () => {
   );
 };
 
-Plan.displayName = "Plan";
+Plan.displayName = "Plan"; // Set displayName for the Plan component
 export default React.memo(Plan);

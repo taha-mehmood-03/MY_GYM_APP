@@ -63,4 +63,7 @@ const ExercisePopover = React.memo(({
   );
 });
 
+// Set the display name for debugging purposes
+ExercisePopover.displayName = "ExercisePopover";
+
 export default ExercisePopover;

@@ -3,7 +3,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();  // Load environment variables from .env.local
 
-const uri = "mongodb://localhost:27017/TAHAKHAN";
+// Get the Mongo URI from the environment variables
+const uri = process.env.MONGO_URI;
 const options = {};
 
 let client;

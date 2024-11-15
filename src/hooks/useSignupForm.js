@@ -29,22 +29,32 @@ const useSignupForm = () => {
   
     const handleSubmit = async (e) => {
       e.preventDefault();
-      const { email, password,currentWeight,targetWeight } = formData;
-   console.log("formdata",formData)
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, currentWeight, targetWeight }),
-      });
-  
-      const data = await res.json();
+      const { email, password, currentWeight, targetWeight } = formData;
+      console.log("formdata", formData);
     
-        console.log("moving to LOgin")
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, currentWeight, targetWeight }),
+        });
+    
+        if (!res.ok) {
+          throw new Error('Something went wrong with the registration request');
+        }
+    
+        const data = await res.json();
+        console.log("moving to Login");
         // router.push('/Tologin');
-       console.log(formData)
-      
-      setMessage(data.message);
+        console.log(formData);
+    
+        setMessage(data.message);
+      } catch (error) {
+        console.error("Error during registration:", error);
+        setMessage("An error occurred during registration. Please try again.");
+      }
     };
+    
   
     return {
       formData,

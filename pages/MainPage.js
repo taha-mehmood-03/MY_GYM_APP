@@ -18,7 +18,7 @@ export const getServerSideProps = async () => {
   try {
     // Fetching images
     const imagesResponse = await axios.get(
-      "http://localhost:3000/api/auth/gettingImages"
+      `${process.env.NEXT_PUBLIC_API_URL}api/auth/gettingImages`
     );
     const initialImages = imagesResponse.data;
 
