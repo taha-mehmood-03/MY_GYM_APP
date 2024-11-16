@@ -2,8 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "store/*": ["src/STORE/*"]  // Add this if you want to keep using store
+      "@/*": ["./src/*"]
     }
   }
 }

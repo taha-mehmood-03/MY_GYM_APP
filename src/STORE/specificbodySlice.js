@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchExercises } from '@/STORE/exerciseSlice'; // Assuming this action fetches exercises
+import { fetchExercises } from './exerciseSlice'; // Assuming this action fetches exercises
 
 const specificBodySlice = createSlice({
   name: 'specificBody',
