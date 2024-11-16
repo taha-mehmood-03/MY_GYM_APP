@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo, useState, Suspense } from "react";
 import { CardFooter, Image } from "@nextui-org/react";
 import { useSelector, useDispatch } from "react-redux";
-import { setSpecificExercise } from "@/store/specificExerciseSlice";
-import { clearSearch } from "@/store/specificbodySlice";
-import { setSrc } from "@/store/mediaSlice";
+import { setSpecificExercise } from "../../STORE/specificExerciseSlice";
+import { clearSearch } from "../../STORE/specificbodySlice";
+import { setSrc } from "../../STORE/mediaSlice";
 import { useRouter } from "next/router";
 import { getvideoForCategory, getvideoManifest } from "@/utils/videoLoader";
 import Img1 from "./gymlogo.jpg";
