@@ -20,4 +20,5 @@ const imageSlice = createSlice({
 
 export const { setImages, clearImages } = imageSlice.actions;
 
+
 export default imageSlice.reducer;
