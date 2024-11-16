@@ -6,7 +6,7 @@ import useImageMap from "@/hooks/useImageMap";
 import useExerciseAppointments from "@/hooks/useExerciseAppointments";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useDispatch } from "react-redux";
-import { fetchExercises } from "../../STORE/exerciseSlice";
+import { fetchExercises } from "@/store/exerciseSlice";
 import Image from "next/image";
 
 // Dynamic imports using React.lazy with displayName
