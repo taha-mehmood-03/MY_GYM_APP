@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
+    "baseUrl": ".", 
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["src/*"],
+      "@/store/*": ["src/store/*"]  // Add this line to correctly resolve the `@/store` alias
     }
   }
 }
