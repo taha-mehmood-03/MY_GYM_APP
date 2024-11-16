@@ -1,28 +1,33 @@
 import { NextResponse } from "next/server";
-import clientPromise from "@/db/mongodb"; // Adjust import path as needed
+import clientPromise from "@/db/mongodb";
 
 export async function GET() {
   try {
     const client = await clientPromise;
     const db = client.db("TAHAKHAN");
-
-    // Collection where images are stored
     const imagesCollection = db.collection("ExerciseImages");
 
-    // Fetch all stored images from the database
     const images = await imagesCollection.find({}).toArray();
 
-    if (images.length === 0) {
-      return NextResponse.json({ message: "No images found" }, { status: 404 });
-    }
+    // Return empty array instead of 404 if no images found
+    return NextResponse.json(images, { 
+      status: 200,
+      headers: {
+        'Cache-Control': 'public, max-age=3600',
+        'Content-Type': 'application/json',
+      }
+    });
 
-    // Return the images
-    return NextResponse.json(images, { status: 200 });
   } catch (error) {
     console.error("Error fetching images:", error);
-    return NextResponse.json(
-      { message: "Server error", error: error.message },
-      { status: 500 }
-    );
+    
+    // More detailed error response
+    const errorResponse = {
+      message: "Server error",
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error',
+      timestamp: new Date().toISOString(),
+    };
+
+    return NextResponse.json(errorResponse, { status: 500 });
   }
 }

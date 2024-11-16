@@ -6,6 +6,8 @@ import axios from "axios";
 
 const fetchImagesFromAPI = async () => {
   const response = await axios.get("/api/auth/gettingImages");
+  console.log(response.data)
+  
   return response.data;
 };
 

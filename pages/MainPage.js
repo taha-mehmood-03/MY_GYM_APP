@@ -3,71 +3,164 @@ import dynamic from "next/dynamic";
 import React, { Suspense } from "react";
 import Navthree from "@/components/NAVBAR/Navthree";
 import axios from "axios";
-import { QueryClient, dehydrate } from "@tanstack/react-query";
-import { setImages } from "@/STORE/imagesSlice"; // Importing the setImages action
+import { setImages } from "@/STORE/imagesSlice";
 import { useDispatch } from "react-redux";
+import { useQuery } from "@tanstack/react-query";
 
+// Dynamic import with SSR enabled
 const BodyPartlists = dynamic(() =>
-  import("@/components/BODYPARTLIST/BodyPartlists")
+  import("@/components/BODYPARTLIST/BodyPartlists"),
+  { ssr: true }
 );
 
-export const getServerSideProps = async () => {
-  const queryClient = new QueryClient();
-  // Moved inside getServerSideProps
+// Query keys for React Query
+const QUERY_KEYS = {
+  IMAGES: 'images',
+  EXERCISES: 'exercises'
+};
 
+// API functions
+const fetchImages = async () => {
   try {
-    // Fetching images
-    const imagesResponse = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}api/auth/gettingImages`
-    );
-    const initialImages = imagesResponse.data;
+    const response = await axios.get("https://localhost:3000/api/auth/gettingImages");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching images:", error);
+    return [];
+  }
+};
 
-    // Dispatch the images to the Redux store
-    // Dispatching images
-
-    // Fetching exercises
-    const exercisesResponse = await axios.get(
+const fetchExercises = async () => {
+  try {
+    const response = await axios.get(
       "https://exercisedb.p.rapidapi.com/exercises/bodyPartList",
       {
         headers: {
-          "X-RapidAPI-Key":
-            "c283f37b6fmsh91e221f7a507e9ep18f65cjsn4394cb61d380",
+          "X-RapidAPI-Key": "c283f37b6fmsh91e221f7a507e9ep18f65cjsn4394cb61d380",
           "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
         },
       }
     );
-    const initialExercises = exercisesResponse.data;
-
-    return {
-      props: {
-        initialImages,
-        initialExercises,
-        dehydratedState: dehydrate(queryClient), // Prefetching query state for hydration
-      },
-    };
+    return response.data;
   } catch (error) {
-    console.error("Error fetching images or exercises:", error);
-    return { props: { initialImages: [], initialExercises: [] } };
+    console.error("Error fetching exercises:", error);
+    return [];
   }
 };
 
-const MainPage = ({ initialImages, initialExercises }) => {
+export async function getServerSideProps() {
+  try {
+    // Fetch data in parallel with timeout
+    const [imagesData, exercisesData] = await Promise.all([
+      Promise.race([
+        fetchImages(),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout')), 5000)
+        )
+      ]),
+      Promise.race([
+        fetchExercises(),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout')), 5000)
+        )
+      ])
+    ]);
+
+    // Prefetch data for React Query
+    return {
+      props: {
+        initialImages: imagesData || [],
+        initialExercises: exercisesData || [],
+      },
+    };
+  } catch (error) {
+    console.error("Error in getServerSideProps:", error);
+    return {
+      props: {
+        initialImages: [],
+        initialExercises: [],
+        error: error.message,
+      },
+    };
+  }
+}
+
+const MainPage = ({ initialImages, initialExercises, error }) => {
   const dispatch = useDispatch();
-  
-  // Dispatch the initial images to the Redux store on the client side
+
+  // Images Query
+  const { data: images, isLoading: imagesLoading } = useQuery({
+    queryKey: [QUERY_KEYS.IMAGES],
+    queryFn: fetchImages,
+    initialData: initialImages,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: 2,
+    onError: (error) => {
+      console.error("Error fetching images:", error);
+    }
+  });
+
+  // Exercises Query
+  const { data: exercises, isLoading: exercisesLoading } = useQuery({
+    queryKey: [QUERY_KEYS.EXERCISES],
+    queryFn: fetchExercises,
+    initialData: initialExercises,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: 2,
+    onError: (error) => {
+      console.error("Error fetching exercises:", error);
+    }
+  });
+
+  // Update Redux store when images change
   React.useEffect(() => {
-    dispatch(setImages(initialImages));
-    // console.log("initialImages",initialImages)
-  }, [initialImages, dispatch]);
+    if (images?.length > 0) {
+      dispatch(setImages(images));
+    }
+  }, [images, dispatch]);
+
+  // Loading state
+  if (imagesLoading || exercisesLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <Navthree />
+        <main className="container mx-auto py-8 px-4">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-pulse">Loading Data...</div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <Navthree />
+        <main className="container mx-auto py-8 px-4">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-red-500">Error loading data. Please try again later.</div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
-    <div className=" bg-black text-white">
+    <div className="min-h-screen bg-black text-white">
       <Navthree />
-      <main className="py-8 px-4">
-        <Suspense fallback={<div>Loading Body Part Lists...</div>}>
+      <main className="container mx-auto py-8 px-4">
+        <Suspense 
+          fallback={
+            <div className="flex items-center justify-center h-64">
+              <div className="animate-pulse">Loading Body Part Lists...</div>
+            </div>
+          }
+        >
           <BodyPartlists
-            initialImages={initialImages}
-            initialExercises={initialExercises}
+            initialImages={images}
+            initialExercises={exercises}
           />
         </Suspense>
       </main>
