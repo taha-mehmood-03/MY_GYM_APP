@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import { NextUIProvider } from '@nextui-org/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import RootLayout from '@/app/layout';
-import { store, persistor } from '@/store/store';
+import { store, persistor } from '../src/STORE/store';
 import '../src/app/globals.css';
 import axios from 'axios';
 

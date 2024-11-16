@@ -9,8 +9,8 @@ import useFetchImages from "@/hooks/useFetchImages";
 import img from "./gymlogo.jpg";
 import useFetchExercises from "@/hooks/useFetchExercises";
 import useImageMap from "@/hooks/useImageMap";
-import { fetchExercises } from "@/store/exerciseSlice";
-import { setExercises } from "@/store/specificBodySlice";
+import { fetchExercises } from "../../STORE/exerciseSlice";
+import { setExercises } from "../../STORE/specificbodySlice";
 import CardSkeleton from "../SKELETON/CardSkeleton";
 //  component with responsive design
 
