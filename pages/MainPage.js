@@ -4,7 +4,7 @@ import React, { Suspense } from "react";
 import Navthree from "@/components/NAVBAR/Navthree";
 import axios from "axios";
 import { QueryClient, dehydrate } from "@tanstack/react-query";
-import { setImages } from "@/store/imagesSlice"; // Importing the setImages action
+import { setImages } from "@/STORE/imagesSlice"; // Importing the setImages action
 import { useDispatch } from "react-redux";
 
 const BodyPartlists = dynamic(() =>

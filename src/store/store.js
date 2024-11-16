@@ -6,13 +6,13 @@ import storage from 'redux-persist/lib/storage'; // Local storage
 import { combineReducers } from 'redux';
 
 // Import all slices
-import exerciseReducer from '@/store/exerciseSlice';
-import specificBodyReducer from '@/store/specificBodySlice';
-import specificExerciseReducer from '@/store/specificExerciseSlice';
-import mediaReducer from '@/store/mediaSlice';
-import caloriesReducer from '@/store/caloriesSlice';
-import imageReducer from '@/store/imagesSlice';
-import filteredImagesReducer from '@/store/filteredImagesSlice';
+import exerciseReducer from '@/STORE/exerciseSlice';
+import specificBodyReducer from '@/STORE/specificBodySlice';
+import specificExerciseReducer from '@/STORE/specificExerciseSlice';
+import mediaReducer from '@/STORE/mediaSlice';
+import caloriesReducer from '@/STORE/caloriesSlice';
+import imageReducer from '@/STORE/imagesSlice';
+import filteredImagesReducer from '@/STORE/filteredImagesSlice';
 
 // Configuration for persisting state in local storage
 const persistConfig = {

@@ -3,7 +3,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "store/*": ["./src/store/*"]  // Add this if you want to keep using store
+      "store/*": ["src/STORE/*"]  // Add this if you want to keep using store
     }
   }
 }

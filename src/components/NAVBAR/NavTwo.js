@@ -18,7 +18,7 @@ import {
 import useInputValue from "@/hooks/useInputValue";
 import { SearchIcon } from "./SearchIcon";
 import { useSelector, useDispatch } from "react-redux";
-import { setImages, clearSearch, searchExercises } from "@/store/specificBodySlice";
+import { setImages, clearSearch, searchExercises } from "@/STORE/specificBodySlice";
 import { getImageManifest } from "@/utils/imageLoader";
 import { useRouter } from "next/router";
 

@@ -1,7 +1,7 @@
 // useFetchImages.js
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
-import { setImages, setStatus, setError } from "@/store/imagesSlice";
+import { setImages, setStatus, setError } from "@/STORE/imagesSlice";
 import axios from "axios";
 
 const fetchImagesFromAPI = async () => {

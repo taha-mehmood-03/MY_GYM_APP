@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { setFilteredImages } from "@/store/filteredImagesSlice";
+import { setFilteredImages } from "@/STORE/filteredImagesSlice";
 import debounce from "lodash/debounce";
 
 // Utility function to normalize names (remove spaces, lowercase)

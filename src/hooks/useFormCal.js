@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { fetchCalories } from '@/store/caloriesSlice'; // Adjust the path accordingly
+import { fetchCalories } from '@/STORE/caloriesSlice'; // Adjust the path accordingly
 
 const useFormCal = () => {
   const [formData, setFormData] = useState({

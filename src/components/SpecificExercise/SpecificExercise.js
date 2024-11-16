@@ -11,9 +11,9 @@ import {
   AccordionItem,
 } from "@nextui-org/react";
 import dynamic from "next/dynamic";
-import { setSpecificExercise } from "@/store/specificExerciseSlice";
+import { setSpecificExercise } from "@/STORE/specificExerciseSlice";
 import { getvideoForCategory, getvideoManifest } from "@/utils/videoLoader";
-import { setSrc } from "@/store/mediaSlice";
+import { setSrc } from "@/STORE/mediaSlice";
 import { useWorkout } from "@/utils/WorkoutContext";
 import { YouTubeEmbed } from "@next/third-parties/google";
 import { faDumbbell, faBullseye } from "@fortawesome/free-solid-svg-icons";

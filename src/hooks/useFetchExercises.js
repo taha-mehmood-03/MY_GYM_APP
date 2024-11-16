@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchExercises } from '@/store/exerciseSlice';
+import { fetchExercises } from '@/STORE/exerciseSlice';
 import debounce from 'lodash.debounce';
 
 const useFetchExercises = (endpoint, slice, initialData = []) => {
