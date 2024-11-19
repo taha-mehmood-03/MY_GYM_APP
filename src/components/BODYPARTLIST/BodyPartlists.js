@@ -59,22 +59,22 @@ const ExerciseCard = ({ exercise, index, imageSrc, handleExercise }) => {
             )}
             
             <Image
-              alt="Exercise image"
-              className={`z-0 object-cover w-full transition-all duration-700 ${
-                imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-              } ${isHovered ? 'transform scale-105' : ''}`}
-              src={imageSrc}
-              layout="responsive"
-              width={800}
-              height={600}
-              loading={index < 3 ? "eager" : "lazy"}
-              priority={index < 3}
-              onLoad={() => setImageLoaded(true)}
-              onError={(e) => {
-                console.error("Image loading error:", e);
-                e.target.onerror = null;
-              }}
-            />
+  alt="Exercise image"
+  className={`z-0 object-cover w-full transition-all duration-700 ${
+    imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+  } ${isHovered ? 'transform scale-105' : ''}`}
+  src={imageSrc}
+  width={800}
+  height={600}
+  loading={index < 3 ? "eager" : "lazy"}
+  priority={index < 3}
+  onLoad={() => setImageLoaded(true)}
+  onError={(e) => {
+    console.error("Image loading error:", e);
+    e.target.onerror = null;
+  }}
+/>
+
 
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>

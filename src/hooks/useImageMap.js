@@ -101,7 +101,8 @@ const useImageMap = (name) => {
     updateImageMap(normalizedInputName, filteredImages);
   }, [name, filteredImages, updateImageMap, normalizedInputName]);
 
-  console.log("Final Image Map:", imageMap); // Log the final image map before returning
+  console.log("Final Image Map:", imageMap);
+ // Log the final image map before returning
   return imageMap;
 };
 
