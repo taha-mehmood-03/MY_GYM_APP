@@ -4,7 +4,7 @@ const useStoreImages = () => {
   const storeImages = useCallback(async (imagesToStore) => {
     if (imagesToStore && Array.isArray(imagesToStore)) {
       try {
-        const response = await fetch('/api/auth/storingImages', {
+        const response = await fetch('process.env.NEXT_PUBLIC_API_URL/api/auth/storingImages', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

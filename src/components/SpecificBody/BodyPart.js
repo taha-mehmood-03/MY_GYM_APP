@@ -15,7 +15,7 @@ const DynamicCard = dynamic(
   () => import("@nextui-org/react").then((mod) => mod.Card),
   {
     loading: () => <CardSkeleton />,
-    ssr: false,
+    ssr: true,
   }
 );
 
