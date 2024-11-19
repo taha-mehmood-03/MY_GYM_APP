@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { setImages, } from "@/STORE/imagesSlice";
 import axios from "axios";
-
 const fetchImagesFromAPI = async () => {
   const response = await axios.get("/api/auth/gettingImages");
   console.log(response.data)

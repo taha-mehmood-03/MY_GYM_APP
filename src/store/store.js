@@ -1,11 +1,19 @@
 // src/store/store.js
-
 import { configureStore } from '@reduxjs/toolkit';
-import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
-import storage from 'redux-persist/lib/storage'; // Local storage
+import { 
+  persistStore, 
+  persistReducer, 
+  FLUSH, 
+  REHYDRATE, 
+  PAUSE, 
+  PERSIST, 
+  PURGE, 
+  REGISTER 
+} from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 import { combineReducers } from 'redux';
 
-// Import all slices
+// Import all reducers
 import exerciseReducer from './exerciseSlice';
 import specificBodyReducer from './specificBodySlice';
 import specificExerciseReducer from './specificExerciseSlice';
@@ -14,22 +22,22 @@ import caloriesReducer from './caloriesSlice';
 import imageReducer from './imagesSlice';
 import filteredImagesReducer from './filteredImagesSlice';
 
-// Configuration for persisting state in local storage
+// Redux Persist Configuration
 const persistConfig = {
   key: 'root',
-  storage, // Correctly using the storage from redux-persist
+  storage,
   whitelist: [
-    'exercise', 
-    'specificBody', 
-    'specificExercise', 
-    'media', 
-    'calories', 
-    'images', 
-    'filteredimages' // Make sure this matches the slice name exactly
+    'exercise',
+    'specificBody',
+    'specificExercise',
+    'media',
+    'calories',
+    'images',
+    'filteredimages'
   ],
 };
 
-// Combine all the reducers into one root reducer
+// Root Reducer Configuration
 const rootReducer = combineReducers({
   exercise: exerciseReducer,
   specificBody: specificBodyReducer,
@@ -37,13 +45,13 @@ const rootReducer = combineReducers({
   media: mediaReducer,
   calories: caloriesReducer,
   images: imageReducer,
-  filteredimages: filteredImagesReducer, // Ensure this key matches the whitelist
+  filteredimages: filteredImagesReducer
 });
 
-// Create a persisted reducer with configuration
+// Create Persisted Reducer
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-// Configure the store with middleware settings to handle non-serializable actions
+// Store Configuration
 export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
@@ -52,7 +60,15 @@ export const store = configureStore({
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
+  devTools: process.env.NODE_ENV !== 'production', // Enable DevTools in development only
 });
 
-// Create a persistor to save the store state
+// Create Persistor
 export const persistor = persistStore(store);
+
+// Optional: Export a function to clear persisted state if needed
+export const purgeStore = () => {
+  persistor.purge();
+};
+
+export default store;

@@ -6,7 +6,6 @@ import axios from "axios";
 import { setImages } from "@/STORE/imagesSlice";
 import { useDispatch } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
-import axiosInstance from "@/utils/axios-config";
 
 // Dynamic import with SSR enabled
 const BodyPartlists = dynamic(() =>
@@ -27,6 +26,7 @@ const fetchImages = async () => {
     const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/gettingImages`);
     
     console.log("Fetched images response:", response.data);
+    dispatch(setImages(response.data));
     return response.data;
   } catch (error) {
     console.error("Error fetching images:", error);
