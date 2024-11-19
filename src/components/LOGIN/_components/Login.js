@@ -13,33 +13,37 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { email, password } = formData;
-
+  
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-
-      const data = await res.json();
-
+  
+      // Check if the response is ok (status code 2xx) and has content
       if (!res.ok) {
-        // Handle specific errors
-        if (data.message === 'User not found') {
-          setErrorField('email');
-          setErrorMessage('Email not found. Please check your email.');
-        } else if (data.message === 'Invalid credentials') {
-          setErrorField('password');
-          setErrorMessage('Incorrect password. Please try again.');
+        const data = await res.json().catch(() => null);  // Safely parse the response
+        if (data && data.message) {
+          // Handle specific error messages from the server
+          if (data.message === 'User not found') {
+            setErrorField('email');
+            setErrorMessage('Email not found. Please check your email.');
+          } else if (data.message === 'Invalid credentials') {
+            setErrorField('password');
+            setErrorMessage('Incorrect password. Please try again.');
+          }
+        } else {
+          setErrorMessage('Unknown error occurred.');
         }
         return;
       }
-
-      // Clear errors on success
+  
+      // Handle success
       setErrorField('');
       setErrorMessage('');
       console.log('Login successful');
-
+  
       // Redirect to MainPage
       router.push('/MainPage');
     } catch (error) {
@@ -47,6 +51,7 @@ function Login() {
       setErrorMessage('Something went wrong. Please try again later.');
     }
   };
+  
 
   return (
     <div className="flex flex-col items-center p-6 mx-auto bg-black bg-opacity-50 backdrop-blur-md backdrop-filter rounded-lg shadow-lg">
@@ -98,7 +103,7 @@ function Login() {
         </Button>
         <p className="text-white mt-4">
           Don’t have an account?{' '}
-          <Link href="/signup" className="text-indigo-400 hover:text-indigo-500">
+          <Link href="/" className="text-indigo-400 hover:text-indigo-500">
             Sign up
           </Link>
         </p>

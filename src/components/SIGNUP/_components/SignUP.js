@@ -10,9 +10,10 @@ const SignUP = () => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { success, message } = await handleSubmit(e);
+      const result = await handleSubmit(e);
+      const { success, message } = result || {}; // Fallback to an empty object if result is undefined
       setMessage(message);
-
+  
       // Redirect to login page if registration is successful
       if (success) {
         setTimeout(() => router.push("/ToLogin"), 2000);
@@ -21,6 +22,7 @@ const SignUP = () => {
       console.error("Error during form submission:", error);
     }
   };
+  
 
   return (
     <div className="relative flex flex-col items-center p-8 mx-auto rounded-2xl overflow-hidden">
