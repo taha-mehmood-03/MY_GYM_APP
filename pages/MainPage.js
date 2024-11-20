@@ -48,9 +48,11 @@ const fetchExercises = async () => {
 };
 
 export async function getServerSideProps(context) {
+  const baseUrl = `https://${context.req.headers.host}` || process.env.NEXT_PUBLIC_API_URL;
+  
   try {
     const [imagesData, exercisesData] = await Promise.all([
-      fetchImages(context.req),
+      axios.get(`${baseUrl}/api/auth/gettingImages`).then(res => res.data),
       fetchExercises(),
     ]);
 
@@ -61,7 +63,7 @@ export async function getServerSideProps(context) {
       },
     };
   } catch (error) {
-    console.error("Error in getServerSideProps:", error);
+    console.error("Server-side fetch error:", error);
     return {
       props: {
         initialImages: [],
