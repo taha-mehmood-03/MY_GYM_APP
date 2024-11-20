@@ -1,4 +1,3 @@
-// MainPage.js
 import dynamic from "next/dynamic";
 import React, { Suspense, useEffect } from "react";
 import Navthree from "@/components/NAVBAR/Navthree";
@@ -20,10 +19,10 @@ const QUERY_KEYS = {
 };
 
 // API functions
-const fetchImages = async () => {
+const fetchImages = async (baseUrl) => {
   console.log("Fetching images...");
   try {
-    const response = await axios.get(process.env.NEXT_PUBLIC_API_URL+ '/api/auth/gettingImages');
+    const response = await axios.get(`${baseUrl}/api/auth/gettingImages`);
     console.log("Fetched images response:", response.data);
     return response.data;
   } catch (error) {
@@ -52,14 +51,19 @@ const fetchExercises = async () => {
   }
 };
 
-export async function getServerSideProps() {
+export async function getServerSideProps(context) {
   console.log("getServerSideProps called - Fetching data on the server...");
+
+  const isProduction = process.env.NODE_ENV === 'production';
+  const baseUrl = isProduction
+    ? process.env.NEXT_PUBLIC_API_URL // Production URL from environment variable
+    : `http://${context.req.headers.host}`; // Development URL based on the request header
 
   try {
     // Fetch data in parallel with timeout
     const [imagesData, exercisesData] = await Promise.all([
       Promise.race([
-        fetchImages(),
+        fetchImages(baseUrl),
         new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Timeout')), 10000)
         ),
@@ -71,7 +75,7 @@ export async function getServerSideProps() {
         ),
       ])
     ]);
-    console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
+    console.log("API URL:", baseUrl);
     console.log("Images data fetched on the server:", imagesData);
     console.log("Exercises data fetched on the server:", exercisesData);
 
