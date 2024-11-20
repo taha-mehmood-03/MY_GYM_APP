@@ -1,15 +1,12 @@
-// next.config.js
-/** @type {import('next').NextConfig} */
 const path = require('path');
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Environment variables
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-    MONGO_URI: process.env.MONGO_URI
+    MONGO_URI: process.env.MONGO_URI,
   },
 
-  // Webpack configuration for aliases
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
@@ -18,23 +15,24 @@ const nextConfig = {
     return config;
   },
 
-  // API routes rewriting
   async rewrites() {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+    if (!apiUrl || !/^https?:\/\//.test(apiUrl)) {
+      throw new Error(
+        'Invalid NEXT_PUBLIC_API_URL. Ensure it starts with http:// or https://'
+      );
+    }
+
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL}/api/:path*`,
-      }
+        destination: `${apiUrl}/api/:path*`,
+      },
     ];
   },
 
-  // Additional configurations
- 
-
-  // Enable strict mode for better development
   reactStrictMode: true,
 
-  // Optional: Configure headers for security
   async headers() {
     return [
       {
