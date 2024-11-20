@@ -1,4 +1,3 @@
-// MainPage.js
 import dynamic from "next/dynamic";
 import React, { Suspense, useEffect } from "react";
 import Navthree from "@/components/NAVBAR/Navthree";
@@ -15,16 +14,14 @@ const BodyPartlists = dynamic(() =>
 
 // Query keys for React Query
 const QUERY_KEYS = {
-  IMAGES: 'images',
-  EXERCISES: 'exercises'
+  IMAGES: "images",
+  EXERCISES: "exercises",
 };
 
 // API functions
 const fetchImages = async () => {
-  console.log("Fetching images...");
   try {
     const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/gettingImages`);
-    console.log("Fetched images response:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching images:", error);
@@ -33,7 +30,6 @@ const fetchImages = async () => {
 };
 
 const fetchExercises = async () => {
-  console.log("Fetching exercises...");
   try {
     const response = await axios.get(
       "https://exercisedb.p.rapidapi.com/exercises/bodyPartList",
@@ -44,7 +40,6 @@ const fetchExercises = async () => {
         },
       }
     );
-    console.log("Fetched exercises response:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching exercises:", error);
@@ -52,32 +47,13 @@ const fetchExercises = async () => {
   }
 };
 
+// Server-side rendering for exercises
 export async function getServerSideProps() {
-  console.log("getServerSideProps called - Fetching data on the server...");
-
+  console.log("Fetching exercises server-side...");
   try {
-    // Fetch data in parallel with timeout
-    const [imagesData, exercisesData] = await Promise.all([
-      Promise.race([
-        fetchImages(),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Timeout')), 10000)
-        ),
-      ]),
-      Promise.race([
-        fetchExercises(),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Timeout')), 10000)
-        ),
-      ])
-    ]);
-    console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
-    console.log("Images data fetched on the server:", imagesData);
-    console.log("Exercises data fetched on the server:", exercisesData);
-
+    const exercisesData = await fetchExercises();
     return {
       props: {
-        initialImages: imagesData || [],
         initialExercises: exercisesData || [],
       },
     };
@@ -85,7 +61,6 @@ export async function getServerSideProps() {
     console.error("Error in getServerSideProps:", error);
     return {
       props: {
-        initialImages: [],
         initialExercises: [],
         error: error.message,
       },
@@ -93,66 +68,60 @@ export async function getServerSideProps() {
   }
 }
 
-const MainPage = ({ initialImages, initialExercises, error }) => {
+const MainPage = ({ initialExercises, error }) => {
   const dispatch = useDispatch();
 
-  // Images Query
-  const { data: images, isLoading: imagesLoading } = useQuery({
+  // Client-side query for images
+  const { data: images, isLoading: imagesLoading, error: imagesError } = useQuery({
     queryKey: [QUERY_KEYS.IMAGES],
     queryFn: fetchImages,
-    initialData: initialImages,
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: 2,
-    onError: (error) => {
-      console.error("Error fetching images in useQuery:", error);
-    },
-  });
-
-  // Exercises Query
-  const { data: exercises, isLoading: exercisesLoading } = useQuery({
-    queryKey: [QUERY_KEYS.EXERCISES],
-    queryFn: fetchExercises,
-    initialData: initialExercises,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    retry: 2,
-    onError: (error) => {
-      console.error("Error fetching exercises in useQuery:", error);
-    },
   });
 
   // Update Redux store when images change
   useEffect(() => {
-    console.log("Images updated:", images);
     if (images?.length > 0) {
-      // Dispatching the images fetched from SSR or React Query
       dispatch(setImages(images));
     }
   }, [images, dispatch]);
 
   // Loading state
-  if (imagesLoading || exercisesLoading) {
-    console.log("Loading data...");
+  if (imagesLoading) {
     return (
       <div className="min-h-screen bg-black text-white">
         <Navthree />
         <main className="container mx-auto py-8 px-4">
           <div className="flex items-center justify-center h-64">
-            <div className="animate-pulse">Loading Data...</div>
+            <div className="animate-pulse">Loading Images...</div>
           </div>
         </main>
       </div>
     );
   }
 
-  // Error state
-  if (error) {
-    console.error("Error loading data:", error);
+  // Error state for images
+  if (imagesError) {
     return (
       <div className="min-h-screen bg-black text-white">
         <Navthree />
         <main className="container mx-auto py-8 px-4">
           <div className="flex items-center justify-center h-64">
-            <div className="text-red-500">Error loading data. Please try again later.</div>
+            <div className="text-red-500">Error loading images. Please try again later.</div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Error state for exercises
+  if (error) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <Navthree />
+        <main className="container mx-auto py-8 px-4">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-red-500">Error loading exercises. Please try again later.</div>
           </div>
         </main>
       </div>
@@ -160,13 +129,11 @@ const MainPage = ({ initialImages, initialExercises, error }) => {
   }
 
   // Render the page when everything is ready
-  console.log("Page rendered with images and exercises");
-
   return (
     <div className="min-h-screen bg-black text-white">
       <Navthree />
       <main className="container mx-auto py-8 px-4">
-        <Suspense 
+        <Suspense
           fallback={
             <div className="flex items-center justify-center h-64">
               <div className="animate-pulse">Loading Body Part Lists...</div>
@@ -175,7 +142,7 @@ const MainPage = ({ initialImages, initialExercises, error }) => {
         >
           <BodyPartlists
             initialImages={images}
-            initialExercises={exercises}
+            initialExercises={initialExercises}
           />
         </Suspense>
       </main>
