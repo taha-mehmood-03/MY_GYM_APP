@@ -6,7 +6,6 @@ import axios from "axios";
 import { setImages } from "@/STORE/imagesSlice";
 import { useDispatch } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
-import apiClient from "@/utils/axios-config";
 
 // Dynamic import with SSR enabled
 const BodyPartlists = dynamic(() =>
@@ -24,7 +23,7 @@ const QUERY_KEYS = {
 const fetchImages = async () => {
   console.log("Fetching images...");
   try {
-    const response = await apiClient.get(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/gettingImages`);
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/gettingImages`);
     console.log("Fetched images response:", response.data);
     return response.data;
   } catch (error) {
@@ -36,7 +35,7 @@ const fetchImages = async () => {
 const fetchExercises = async () => {
   console.log("Fetching exercises...");
   try {
-    const response = await apiClient.get(
+    const response = await axios.get(
       "https://exercisedb.p.rapidapi.com/exercises/bodyPartList",
       {
         headers: {
@@ -57,25 +56,24 @@ export async function getServerSideProps() {
   console.log("getServerSideProps called - Fetching data on the server...");
 
   try {
-    // Fetch data in parallel with timeout and error handling
-    const fetchWithTimeout = async (promise, timeoutMs = 10000) => {
-      return Promise.race([
-        promise,
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Request timeout')), timeoutMs)
-        ),
-      ]);
-    };
-
+    // Fetch data in parallel with timeout
     const [imagesData, exercisesData] = await Promise.all([
-      fetchWithTimeout(fetchImages()),
-      fetchWithTimeout(fetchExercises())
+      Promise.race([
+        fetchImages(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Timeout')), 10000)
+        ),
+      ]),
+      Promise.race([
+        fetchExercises(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Timeout')), 10000)
+        ),
+      ])
     ]);
-
-    console.log('Server Environment:', {
-      nodeEnv: process.env.NODE_ENV,
-      apiUrl: process.env.NEXT_PUBLIC_API_URL
-    });
+    console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
+    console.log("Images data fetched on the server:", imagesData);
+    console.log("Exercises data fetched on the server:", exercisesData);
 
     return {
       props: {
@@ -94,6 +92,7 @@ export async function getServerSideProps() {
     };
   }
 }
+
 const MainPage = ({ initialImages, initialExercises, error }) => {
   const dispatch = useDispatch();
 
