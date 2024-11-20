@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import { useDispatch, useSelector } from "react-redux";
 import Router from "next/router";
 import debounce from "lodash.debounce";
-import { Card, CardFooter, Button} from "@nextui-org/react";
+import { Card, CardFooter, Button } from "@nextui-org/react";
 import Image from "next/image";
 import useFetchImages from "@/hooks/useFetchImages";
 import img from "./gymlogo.jpg";
@@ -13,7 +13,6 @@ import { fetchExercises } from "@/STORE/exerciseSlice";
 import { setExercises } from "@/STORE/specificBodySlice";
 import CardSkeleton from "../SKELETON/CardSkeleton";
 //  component with responsive design
-
 
 // Dynamic card with skeleton loading
 const DynamicCard = dynamic(
@@ -27,9 +26,11 @@ const DynamicCard = dynamic(
 // Responsive loading grid
 const LoadingGrid = ({ count = 6 }) => (
   <div className="grid grid-cols-1 gap-6 w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-    {Array(count).fill(0).map((_, index) => (
-      <CardSkeleton key={index} />
-    ))}
+    {Array(count)
+      .fill(0)
+      .map((_, index) => (
+        <CardSkeleton key={index} />
+      ))}
   </div>
 );
 
@@ -39,8 +40,8 @@ const ExerciseCard = ({ exercise, index, imageSrc, handleExercise }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div 
-      key={exercise.id || index} 
+    <div
+      key={exercise.id || index}
       className="flex justify-center w-full "
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -57,33 +58,30 @@ const ExerciseCard = ({ exercise, index, imageSrc, handleExercise }) => {
                 </div>
               </div>
             )}
-            
-            <Image
-  alt="Exercise image"
-  className={`z-0 object-cover w-full transition-all duration-700 ${
-    imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-  } ${isHovered ? 'transform scale-105' : ''}`}
-  src={imageSrc}
-  width={800}
-  height={600}
-  loading={index < 3 ? "eager" : "lazy"}
-  priority={index < 3}
-  onLoad={() => setImageLoaded(true)}
-  onError={(e) => {
-    console.error("Image loading error:", e);
-    e.target.onerror = null;
-  }}
-/>
 
+            <Image
+              alt="Exercise image"
+              className={`z-0 object-cover w-full transition-all duration-700 ${
+                imageLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95"
+              } ${isHovered ? "transform scale-105" : ""}`}
+              src={imageSrc}
+              width={800}
+              height={600}
+              loading={index < 3 ? "eager" : "lazy"}
+              priority={index < 3}
+              onLoad={() => setImageLoaded(true)}
+              onError={(e) => {
+                console.error("Image loading error:", e);
+                e.target.onerror = null;
+              }}
+            />
 
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>
 
           <CardFooter className="absolute bottom-0 z-10 w-full bg-black/60 backdrop-blur-sm border-t border-violet-600/30 p-6">
             <div className="flex flex-grow gap-4 items-center">
-              <div className="relative overflow-hidden rounded-full w-11 h-11 bg-gradient-to-br from-indigo-500 to-violet-500 p-0.5">
-             
-              </div>
+              <div className="relative overflow-hidden rounded-full w-11 h-11 bg-gradient-to-br from-indigo-500 to-violet-500 p-0.5"></div>
               <div className="flex flex-col">
                 <p className="text-sm text-blue-400 font-medium">Build Your</p>
                 <h4 className="text-white font-bold text-xl group-hover:text-blue-400 transition-colors duration-300">
@@ -117,7 +115,7 @@ const BodyPartlists = ({ initialImages, initialExercises }) => {
     status: imageStatus,
     error: imageError,
   } = useFetchImages(initialImages);
-  
+
   const {
     data: exercises,
     status: exerciseStatus,
@@ -144,7 +142,7 @@ const BodyPartlists = ({ initialImages, initialExercises }) => {
       setExerciseName(formattedName);
 
       const apiEndpoint = `https://exercisedb.p.rapidapi.com/exercises/bodyPart/${formattedName}`;
-      
+
       dispatch(
         fetchExercises({
           endpoint: apiEndpoint,
