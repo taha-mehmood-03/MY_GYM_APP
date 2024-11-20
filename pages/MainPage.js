@@ -24,16 +24,13 @@ const fetchImages = async () => {
   console.log("Fetching images...");
   try {
     const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/gettingImages`);
-    
     console.log("Fetched images response:", response.data);
-    dispatch(setImages(response.data));
     return response.data;
   } catch (error) {
     console.error("Error fetching images:", error);
     return [];
   }
 };
-
 
 const fetchExercises = async () => {
   console.log("Fetching exercises...");
