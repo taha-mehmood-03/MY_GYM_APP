@@ -35,6 +35,7 @@
     "imagemin-mozjpeg": "^10.0.0",
     "imagemin-pngquant": "^10.0.0",
     "imagemin-webp": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.10.0",
     "next": "^14.2.14",
     "next-cloudinary": "^6.9.0",
