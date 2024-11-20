@@ -49,7 +49,8 @@ const fetchExercises = async () => {
 
 export async function getServerSideProps(context) {
   const baseUrl = `https://${context.req.headers.host}` || process.env.NEXT_PUBLIC_API_URL;
-  
+  console.log("baseUrl",baseUrl)
+  console.log(`https://${context.req.headers.host}`)
   try {
     const [imagesData, exercisesData] = await Promise.all([
       axios.get(`${baseUrl}/api/auth/gettingImages`).then(res => res.data),
@@ -155,3 +156,5 @@ const MainPage = ({ initialImages, initialExercises, error }) => {
 };
 
 export default MainPage;
+
+

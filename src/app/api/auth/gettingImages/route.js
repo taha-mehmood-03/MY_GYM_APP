@@ -21,7 +21,7 @@ export async function GET() {
       headers: {
         'Cache-Control': 'public, max-age=3600',
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*', // Add CORS header
+        'Access-Control-Allow-Origin': process.env.NEXT_PUBLIC_API_URL, // Correctly reference the environment variable
       }
     });
   } catch (error) {
@@ -40,7 +40,7 @@ export async function GET() {
     return NextResponse.json(errorResponse, { 
       status: 500,
       headers: {
-        'Access-Control-Allow-Origin': '*', // Add CORS header
+        'Access-Control-Allow-Origin': '*', // Add CORS header for fallback
       }
     });
   }
