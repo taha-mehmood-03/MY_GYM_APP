@@ -1,23 +1,12 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/db/mongodb";
-import jwt from "jsonwebtoken";
 
-export async function GET(request) {
+export async function GET() {
   try {
-    // Get the token from the Authorization header
-    const token = request.headers.get('Authorization')?.split(' ')[1]; // Extract token after "Bearer"
+    // Log environment details for debugging
+    console.log('Current Environment:', process.env.NODE_ENV);
+    console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
 
-    if (!token) {
-      return NextResponse.json({ message: 'Authorization token is missing' }, { status: 401 });
-    }
-
-    // Verify the JWT token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Log the decoded user information (optional)
-    console.log('Authenticated user:', decoded);
-
-    // Proceed with fetching images
     const client = await clientPromise;
     const db = client.db("TAHAKHAN");
     const imagesCollection = db.collection("ExerciseImages");
@@ -36,7 +25,23 @@ export async function GET(request) {
       }
     });
   } catch (error) {
-    console.error("Error:", error);
-    return NextResponse.json({ message: "Invalid token or server error" }, { status: 401 });
+    console.error("Detailed error fetching images:", {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+
+    const errorResponse = {
+      message: "Server error",
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error',
+      timestamp: new Date().toISOString(),
+    };
+
+    return NextResponse.json(errorResponse, { 
+      status: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*', // Add CORS header for fallback
+      }
+    });
   }
 }
