@@ -1,30 +1,39 @@
+// services/api.js
 import axios from 'axios';
-import https from 'https';
 
-// Create a custom axios instance with proper configuration
-const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
+const apiClient = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
   }
 });
 
-// Configure https agent for development
-if (process.env.NODE_ENV === 'development') {
-  axiosInstance.defaults.httpsAgent = new https.Agent({
-    rejectUnauthorized: false
-  });
-}
-
-// Add response interceptor for error handling
-axiosInstance.interceptors.response.use(
-  (response) => response,
+// Request interceptor for error handling
+apiClient.interceptors.request.use(
+  (config) => {
+    // Log the request in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('API Request:', config.url);
+    }
+    return config;
+  },
   (error) => {
-    console.error('API Error:', error.message);
-    // You can add custom error handling here
     return Promise.reject(error);
   }
 );
 
-export default axiosInstance;
+// Response interceptor for error handling
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('API Error:', {
+      message: error.message,
+      url: error.config?.url,
+      status: error.response?.status
+    });
+    return Promise.reject(error);
+  }
+);
+
+export default apiClient;
