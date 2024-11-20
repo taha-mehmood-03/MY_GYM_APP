@@ -19,11 +19,9 @@ const QUERY_KEYS = {
 };
 
 // API functions
-const fetchImages = async (baseUrl) => {
-  console.log("Fetching images...");
+const fetchImages = async (req) => {
   try {
-    const response = await axios.get(`${baseUrl}/api/auth/gettingImages`);
-    console.log("Fetched images response:", response.data);
+    const response = await axios.get(`https://${req.headers.host}/api/auth/gettingImages`);
     return response.data;
   } catch (error) {
     console.error("Error fetching images:", error);
@@ -32,7 +30,6 @@ const fetchImages = async (baseUrl) => {
 };
 
 const fetchExercises = async () => {
-  console.log("Fetching exercises...");
   try {
     const response = await axios.get(
       "https://exercisedb.p.rapidapi.com/exercises/bodyPartList",
@@ -43,7 +40,6 @@ const fetchExercises = async () => {
         },
       }
     );
-    console.log("Fetched exercises response:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching exercises:", error);
@@ -52,32 +48,11 @@ const fetchExercises = async () => {
 };
 
 export async function getServerSideProps(context) {
-  console.log("getServerSideProps called - Fetching data on the server...");
-
-  const isProduction = process.env.NODE_ENV === 'production';
-  const baseUrl = isProduction
-    ? process.env.NEXT_PUBLIC_API_URL // Production URL from environment variable
-    : `http://${context.req.headers.host}`; // Development URL based on the request header
-
   try {
-    // Fetch data in parallel with timeout
     const [imagesData, exercisesData] = await Promise.all([
-      Promise.race([
-        fetchImages(baseUrl),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Timeout')), 10000)
-        ),
-      ]),
-      Promise.race([
-        fetchExercises(),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Timeout')), 10000)
-        ),
-      ])
+      fetchImages(context.req),
+      fetchExercises(),
     ]);
-    console.log("API URL:", baseUrl);
-    console.log("Images data fetched on the server:", imagesData);
-    console.log("Exercises data fetched on the server:", exercisesData);
 
     return {
       props: {
@@ -103,7 +78,7 @@ const MainPage = ({ initialImages, initialExercises, error }) => {
   // Images Query
   const { data: images, isLoading: imagesLoading } = useQuery({
     queryKey: [QUERY_KEYS.IMAGES],
-    queryFn: fetchImages,
+    queryFn: () => fetchImages(),
     initialData: initialImages,
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: 2,
@@ -124,18 +99,13 @@ const MainPage = ({ initialImages, initialExercises, error }) => {
     },
   });
 
-  // Update Redux store when images change
   useEffect(() => {
-    console.log("Images updated:", images);
     if (images?.length > 0) {
-      // Dispatching the images fetched from SSR or React Query
       dispatch(setImages(images));
     }
   }, [images, dispatch]);
 
-  // Loading state
   if (imagesLoading || exercisesLoading) {
-    console.log("Loading data...");
     return (
       <div className="min-h-screen bg-black text-white">
         <Navthree />
@@ -148,9 +118,7 @@ const MainPage = ({ initialImages, initialExercises, error }) => {
     );
   }
 
-  // Error state
   if (error) {
-    console.error("Error loading data:", error);
     return (
       <div className="min-h-screen bg-black text-white">
         <Navthree />
@@ -162,9 +130,6 @@ const MainPage = ({ initialImages, initialExercises, error }) => {
       </div>
     );
   }
-
-  // Render the page when everything is ready
-  console.log("Page rendered with images and exercises");
 
   return (
     <div className="min-h-screen bg-black text-white">
