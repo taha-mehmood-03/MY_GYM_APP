@@ -1,3 +1,4 @@
+// MainPage.js
 import dynamic from "next/dynamic";
 import React, { Suspense, useEffect } from "react";
 import Navthree from "@/components/NAVBAR/Navthree";
@@ -19,9 +20,11 @@ const QUERY_KEYS = {
 };
 
 // API functions
-const fetchImages = async (req) => {
+const fetchImages = async () => {
+  console.log("Fetching images...");
   try {
-    const response = await axios.get(`https://${req.headers.host}/api/auth/gettingImages`);
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/gettingImages`);
+    console.log("Fetched images response:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching images:", error);
@@ -30,6 +33,7 @@ const fetchImages = async (req) => {
 };
 
 const fetchExercises = async () => {
+  console.log("Fetching exercises...");
   try {
     const response = await axios.get(
       "https://exercisedb.p.rapidapi.com/exercises/bodyPartList",
@@ -40,6 +44,7 @@ const fetchExercises = async () => {
         },
       }
     );
+    console.log("Fetched exercises response:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching exercises:", error);
@@ -47,15 +52,28 @@ const fetchExercises = async () => {
   }
 };
 
-export async function getServerSideProps(context) {
-  const baseUrl = `https://${context.req.headers.host}` || process.env.NEXT_PUBLIC_API_URL;
-  console.log("baseUrl",baseUrl)
-  console.log(`https://${context.req.headers.host}`)
+export async function getServerSideProps() {
+  console.log("getServerSideProps called - Fetching data on the server...");
+
   try {
+    // Fetch data in parallel with timeout
     const [imagesData, exercisesData] = await Promise.all([
-      axios.get(`${baseUrl}/api/auth/gettingImages`).then(res => res.data),
-      fetchExercises(),
+      Promise.race([
+        fetchImages(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Timeout')), 10000)
+        ),
+      ]),
+      Promise.race([
+        fetchExercises(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Timeout')), 10000)
+        ),
+      ])
     ]);
+    console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
+    console.log("Images data fetched on the server:", imagesData);
+    console.log("Exercises data fetched on the server:", exercisesData);
 
     return {
       props: {
@@ -64,7 +82,7 @@ export async function getServerSideProps(context) {
       },
     };
   } catch (error) {
-    console.error("Server-side fetch error:", error);
+    console.error("Error in getServerSideProps:", error);
     return {
       props: {
         initialImages: [],
@@ -81,7 +99,7 @@ const MainPage = ({ initialImages, initialExercises, error }) => {
   // Images Query
   const { data: images, isLoading: imagesLoading } = useQuery({
     queryKey: [QUERY_KEYS.IMAGES],
-    queryFn: () => fetchImages(),
+    queryFn: fetchImages,
     initialData: initialImages,
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: 2,
@@ -102,13 +120,18 @@ const MainPage = ({ initialImages, initialExercises, error }) => {
     },
   });
 
+  // Update Redux store when images change
   useEffect(() => {
+    console.log("Images updated:", images);
     if (images?.length > 0) {
+      // Dispatching the images fetched from SSR or React Query
       dispatch(setImages(images));
     }
   }, [images, dispatch]);
 
+  // Loading state
   if (imagesLoading || exercisesLoading) {
+    console.log("Loading data...");
     return (
       <div className="min-h-screen bg-black text-white">
         <Navthree />
@@ -121,7 +144,9 @@ const MainPage = ({ initialImages, initialExercises, error }) => {
     );
   }
 
+  // Error state
   if (error) {
+    console.error("Error loading data:", error);
     return (
       <div className="min-h-screen bg-black text-white">
         <Navthree />
@@ -133,6 +158,9 @@ const MainPage = ({ initialImages, initialExercises, error }) => {
       </div>
     );
   }
+
+  // Render the page when everything is ready
+  console.log("Page rendered with images and exercises");
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -156,5 +184,3 @@ const MainPage = ({ initialImages, initialExercises, error }) => {
 };
 
 export default MainPage;
-
-
