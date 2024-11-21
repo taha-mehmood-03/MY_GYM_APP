@@ -6,15 +6,13 @@ import debounce from "lodash.debounce";
 import { Card, CardFooter, Button } from "@nextui-org/react";
 import Image from "next/image";
 import useFetchImages from "@/hooks/useFetchImages";
-import img from "./gymlogo.jpg";
 import useFetchExercises from "@/hooks/useFetchExercises";
 import useImageMap from "@/hooks/useImageMap";
 import { fetchExercises } from "@/STORE/exerciseSlice";
 import { setExercises } from "@/STORE/specificBodySlice";
 import CardSkeleton from "../SKELETON/CardSkeleton";
-//  component with responsive design
 
-// Dynamic card with skeleton loading
+// Dynamic imports for better performance
 const DynamicCard = dynamic(
   () => import("@nextui-org/react").then((mod) => mod.Card),
   {
@@ -23,18 +21,14 @@ const DynamicCard = dynamic(
   }
 );
 
-// Responsive loading grid
 const LoadingGrid = ({ count = 6 }) => (
   <div className="grid grid-cols-1 gap-6 w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-    {Array(count)
-      .fill(0)
-      .map((_, index) => (
-        <CardSkeleton key={index} />
-      ))}
+    {Array.from({ length: count }, (_, index) => (
+      <CardSkeleton key={index} />
+    ))}
   </div>
 );
 
-// Enhanced Exercise Card Component
 const ExerciseCard = ({ exercise, index, imageSrc, handleExercise }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -42,23 +36,18 @@ const ExerciseCard = ({ exercise, index, imageSrc, handleExercise }) => {
   return (
     <div
       key={exercise.id || index}
-      className="flex justify-center w-full "
+      className="flex justify-center w-full"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <DynamicCard className="group w-full max-w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl overflow-hidden  transform transition-all duration-300 hover:scale-[1.02]">
+      <DynamicCard className="group w-full max-w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl overflow-hidden transform transition-all duration-300 hover:scale-[1.02]">
         <div className="relative w-full bg-gradient-to-br from-indigo-900 to-violet-900 p-1 rounded-xl">
           <div className="relative w-full rounded-lg overflow-hidden">
             {!imageLoaded && (
               <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-indigo-900 to-violet-900">
-                <div className="relative w-16 h-16">
-                  <div className="absolute top-0 left-0 w-16 h-16 border-4 border-indigo-500 rounded-full animate-spin border-t-transparent"></div>
-                  <div className="absolute top-2 left-2 w-12 h-12 border-4 border-violet-500 rounded-full animate-spin-reverse border-t-transparent"></div>
-                  <div className="absolute top-4 left-4 w-8 h-8 border-4  border-indigo-400 rounded-full animate-bounce"></div>
-                </div>
+                <div className="loader"></div>
               </div>
             )}
-
             <Image
               alt="Exercise image"
               className={`z-0 object-cover w-full transition-all duration-700 ${
@@ -75,10 +64,8 @@ const ExerciseCard = ({ exercise, index, imageSrc, handleExercise }) => {
                 e.target.onerror = null;
               }}
             />
-
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>
-
           <CardFooter className="absolute bottom-0 z-10 w-full bg-black/60 backdrop-blur-sm border-t border-violet-600/30 p-6">
             <div className="flex flex-grow gap-4 items-center">
               <div className="relative overflow-hidden rounded-full w-11 h-11 bg-gradient-to-br from-indigo-500 to-violet-500 p-0.5"></div>
@@ -104,18 +91,15 @@ const ExerciseCard = ({ exercise, index, imageSrc, handleExercise }) => {
   );
 };
 
-// Main component
-const BodyPartlists = ({ initialImages, initialExercises }) => {
+const BodyPartLists = ({ initialImages, initialExercises }) => {
   const dispatch = useDispatch();
   const [exerciseName, setExerciseName] = useState("bodyparts");
 
-  // Fetch data using custom hooks
   const {
     data: images,
     status: imageStatus,
     error: imageError,
   } = useFetchImages(initialImages);
-
   const {
     data: exercises,
     status: exerciseStatus,
@@ -125,34 +109,25 @@ const BodyPartlists = ({ initialImages, initialExercises }) => {
     "exercise",
     initialExercises
   );
-
   const imageMap = useImageMap(exerciseName);
-  const specificBody = useSelector((state) => state.specificBody);
   const memoizedExercises = useMemo(() => exercises || [], [exercises]);
 
-  // Handle exercise selection with debounce
   const handleExercise = useCallback(
     debounce((name) => {
       if (!name || typeof name !== "string") {
         console.error("Invalid exercise name:", name);
         return;
       }
-
       const formattedName = encodeURIComponent(name.trim().toLowerCase());
       setExerciseName(formattedName);
 
       const apiEndpoint = `https://exercisedb.p.rapidapi.com/exercises/bodyPart/${formattedName}`;
 
-      dispatch(
-        fetchExercises({
-          endpoint: apiEndpoint,
-          slice: "specificBody",
-        })
-      )
+      dispatch(fetchExercises({ endpoint: apiEndpoint, slice: "specificBody" }))
         .then((response) => {
           const exercises = response.payload.data;
           dispatch(setExercises(exercises));
-          return Router.push("/SpecificPart");
+          Router.push("/SpecificPart");
         })
         .catch((error) => {
           console.error("Error fetching exercises:", error);
@@ -161,7 +136,6 @@ const BodyPartlists = ({ initialImages, initialExercises }) => {
     [dispatch]
   );
 
-  // Render exercise list with memoization
   const renderExerciseList = useMemo(() => {
     return memoizedExercises.map((exercise, index) => {
       const bodypartsArray = imageMap?.bodyparts || [];
@@ -182,12 +156,10 @@ const BodyPartlists = ({ initialImages, initialExercises }) => {
     });
   }, [memoizedExercises, imageMap, handleExercise]);
 
-  // Show loading state
   if (exerciseStatus === "loading" || imageStatus === "loading") {
     return <LoadingGrid />;
   }
 
-  // Show error state
   if (exerciseError || imageError) {
     return (
       <div className="text-center text-red-500 p-4">
@@ -196,7 +168,6 @@ const BodyPartlists = ({ initialImages, initialExercises }) => {
     );
   }
 
-  // Render main content
   return (
     <Suspense fallback={<LoadingGrid />}>
       <div className="grid bg-black grid-cols-1 gap-4 w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
@@ -206,4 +177,4 @@ const BodyPartlists = ({ initialImages, initialExercises }) => {
   );
 };
 
-export default BodyPartlists;
+export default BodyPartLists;
