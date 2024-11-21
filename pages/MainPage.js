@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import React, { Suspense, useEffect } from "react";
 import Navthree from "@/components/NAVBAR/Navthree";
 import axios from "axios";
-import { setImages, setExercises } from "@/STORE/dataSlice";
+import { setImages } from "@/STORE/imagesSlice";
 import { useDispatch } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
 
@@ -21,16 +21,19 @@ const QUERY_KEYS = {
 
 // API functions
 const fetchImages = async () => {
+  console.log("Fetching images...");
   try {
     const response = await axios.get("https://my-gym-app-co8y-icfsgooy7-taha-mehmoods-projects-175bb778.vercel.app/api/auth/gettingImages");
+    console.log("Fetched images response:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching images:", error);
-    throw error;
+    return [];
   }
 };
 
 const fetchExercises = async () => {
+  console.log("Fetching exercises...");
   try {
     const response = await axios.get(
       "https://exercisedb.p.rapidapi.com/exercises/bodyPartList",
@@ -41,14 +44,17 @@ const fetchExercises = async () => {
         },
       }
     );
+    console.log("Fetched exercises response:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching exercises:", error);
-    throw error;
+    return [];
   }
 };
 
 export async function getServerSideProps() {
+  console.log("getServerSideProps called - Fetching data on the server...");
+
   try {
     // Fetch data in parallel with timeout
     const [imagesData, exercisesData] = await Promise.all([
@@ -65,6 +71,9 @@ export async function getServerSideProps() {
         ),
       ])
     ]);
+    console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
+    console.log("Images data fetched on the server:", imagesData);
+    console.log("Exercises data fetched on the server:", exercisesData);
 
     return {
       props: {
@@ -111,18 +120,18 @@ const MainPage = ({ initialImages, initialExercises, error }) => {
     },
   });
 
-  // Update Redux store when images and exercises change
+  // Update Redux store when images change
   useEffect(() => {
+    console.log("Images updated:", images);
     if (images?.length > 0) {
+      // Dispatching the images fetched from SSR or React Query
       dispatch(setImages(images));
     }
-    if (exercises?.length > 0) {
-      dispatch(setExercises(exercises));
-    }
-  }, [images, exercises, dispatch]);
+  }, [images, dispatch]);
 
   // Loading state
   if (imagesLoading || exercisesLoading) {
+    console.log("Loading data...");
     return (
       <div className="min-h-screen bg-black text-white">
         <Navthree />
@@ -137,6 +146,7 @@ const MainPage = ({ initialImages, initialExercises, error }) => {
 
   // Error state
   if (error) {
+    console.error("Error loading data:", error);
     return (
       <div className="min-h-screen bg-black text-white">
         <Navthree />
@@ -150,11 +160,13 @@ const MainPage = ({ initialImages, initialExercises, error }) => {
   }
 
   // Render the page when everything is ready
+  console.log("Page rendered with images and exercises");
+
   return (
     <div className="min-h-screen bg-black text-white">
       <Navthree />
       <main className="container mx-auto py-8 px-4">
-        <Suspense
+        <Suspense 
           fallback={
             <div className="flex items-center justify-center h-64">
               <div className="animate-pulse">Loading Body Part Lists...</div>
