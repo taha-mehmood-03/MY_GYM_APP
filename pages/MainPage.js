@@ -1,11 +1,11 @@
-// MainPage.js
 import dynamic from "next/dynamic";
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import Navthree from "@/components/NAVBAR/Navthree";
 import axios from "axios";
 import { setImages } from "@/STORE/imagesSlice";
 import { useDispatch } from "react-redux";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { debounce } from "lodash";
 
 // Dynamic import with SSR enabled
 const BodyPartlists = dynamic(() =>
@@ -52,6 +52,36 @@ const fetchExercises = async () => {
   }
 };
 
+// Debounced function for fetching exercises
+const debouncedFetchExercises = debounce(fetchExercises, 500);
+
+// Rate limiting function
+const rateLimit = (fn, limit, period) => {
+  let count = 0;
+  let startTime = Date.now();
+
+  return async (...args) => {
+    const currentTime = Date.now();
+    const elapsed = currentTime - startTime;
+
+    if (elapsed > period * 1000) {
+      count = 0;
+      startTime = currentTime;
+    }
+
+    if (count < limit) {
+      count++;
+      return fn(...args);
+    } else {
+      console.log("Rate limit exceeded. Waiting...");
+      await new Promise((resolve) => setTimeout(resolve, period * 1000 - elapsed));
+      return fn(...args);
+    }
+  };
+};
+
+const rateLimitedFetchExercises = rateLimit(debouncedFetchExercises, 1000, 3600);
+
 export async function getServerSideProps() {
   console.log("getServerSideProps called - Fetching data on the server...");
 
@@ -65,7 +95,7 @@ export async function getServerSideProps() {
         ),
       ]),
       Promise.race([
-        fetchExercises(),
+        rateLimitedFetchExercises(),
         new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Timeout')), 10000)
         ),
@@ -95,9 +125,11 @@ export async function getServerSideProps() {
 
 const MainPage = ({ initialImages, initialExercises, error }) => {
   const dispatch = useDispatch();
+  const [imagesLoading, setImagesLoading] = useState(false);
+  const [exercisesLoading, setExercisesLoading] = useState(false);
 
   // Images Query
-  const { data: images, isLoading: imagesLoading } = useQuery({
+  const { data: images, isLoading: imagesQueryLoading } = useQuery({
     queryKey: [QUERY_KEYS.IMAGES],
     queryFn: fetchImages,
     initialData: initialImages,
@@ -105,18 +137,6 @@ const MainPage = ({ initialImages, initialExercises, error }) => {
     retry: 2,
     onError: (error) => {
       console.error("Error fetching images in useQuery:", error);
-    },
-  });
-
-  // Exercises Query
-  const { data: exercises, isLoading: exercisesLoading } = useQuery({
-    queryKey: [QUERY_KEYS.EXERCISES],
-    queryFn: fetchExercises,
-    initialData: initialExercises,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    retry: 2,
-    onError: (error) => {
-      console.error("Error fetching exercises in useQuery:", error);
     },
   });
 
