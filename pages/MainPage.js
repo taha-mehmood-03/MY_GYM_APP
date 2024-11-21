@@ -195,7 +195,7 @@ const MainPage = ({ initialImages, initialExercises, error }) => {
         >
           <BodyPartlists
             initialImages={images}
-            initialExercises={exercises}
+            initialExercises={initialExercises}
           />
         </Suspense>
       </main>
