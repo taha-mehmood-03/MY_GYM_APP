@@ -160,13 +160,13 @@ const BodyPartLists = ({ initialImages, initialExercises }) => {
     return <LoadingGrid />;
   }
 
-  if (exerciseError || imageError) {
-    return (
-      <div className="text-center text-red-500 p-4">
-        Error loading content. Please try again.
-      </div>
-    );
-  }
+  // if (exerciseError || imageError) {
+  //   return (
+  //     <div className="text-center text-red-500 p-4">
+  //       Error loading content. Please try again.
+  //     </div>
+  //   );
+  // }
 
   return (
     <Suspense fallback={<LoadingGrid />}>
