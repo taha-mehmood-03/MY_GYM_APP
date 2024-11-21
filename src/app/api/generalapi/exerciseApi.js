@@ -5,7 +5,7 @@ export const fetchData = async (url) => {
   try {
     const response = await axios.get(url, {
       headers: {
-        'x-rapidapi-key': process.env.X_RapidAPI_Key, // Use your actual RapidAPI key
+        'x-rapidapi-key': "c8ebee3918msh76b6f3fcec77a0cp1389f0jsnad7f7298eb82" ,// Use your actual RapidAPI key
         'x-rapidapi-host': 'exercisedb.p.rapidapi.com',
       },
     });

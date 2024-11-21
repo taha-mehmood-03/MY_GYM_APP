@@ -8,7 +8,7 @@ export const fetchExercises = createAsyncThunk(
     try {
       const response = await axios.get(endpoint, {
         headers: {
-          "X-RapidAPI-Key": process.env.X_RapidAPI_Key,
+          "X-RapidAPI-Key":"c8ebee3918msh76b6f3fcec77a0cp1389f0jsnad7f7298eb82",
           "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
         },
       });
