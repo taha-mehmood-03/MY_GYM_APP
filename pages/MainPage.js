@@ -39,7 +39,7 @@ const fetchExercises = async () => {
       "https://exercisedb.p.rapidapi.com/exercises/bodyPartList",
       {
         headers: {
-          "X-RapidAPI-Key": "c283f37b6fmsh91e221f7a507e9ep18f65cjsn4394cb61d380",
+          "X-RapidAPI-Key": "c8ebee3918msh76b6f3fcec77a0cp1389f0jsnad7f7298eb82",
           "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
         },
       }
