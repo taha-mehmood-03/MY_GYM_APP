@@ -121,7 +121,7 @@ const BodyPartLists = ({ initialImages, initialExercises }) => {
       const formattedName = encodeURIComponent(name.trim().toLowerCase());
       setExerciseName(formattedName);
 
-      const apiEndpoint = `https://exercisedb.p.rapidapi.com/exercises/bodyPart/${formattedName}`;
+      const apiEndpoint = `https://exercisedb.p.rapidapi.com/exercises/bodyPart/${formattedName}?limit=1000&offset=0`;
 
       dispatch(fetchExercises({ endpoint: apiEndpoint, slice: "specificBody" }))
         .then((response) => {

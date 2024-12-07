@@ -100,9 +100,9 @@ const ExerciseCard = ({ exercise, matchedImage, index, onClick }) => {
             </div>
           </div>
         </DynamicCard>
-      ) : (
+      ): (
         <CardSkeleton />
-      )}
+      )} 
     </div>
   );
 };
@@ -163,11 +163,14 @@ const SpecificPart = () => {
         (item) =>
           normalizeName(item.bodyPart) === normalizeName(exercise.bodyPart)
       );
+      console.log(":normalizedExerciseName",normalizedExerciseName)
 
       if (filteredImageData) {
+        console.log("filteredImageData",filteredImageData)
         const matchedImage = filteredImageData.imageUrl.find((url) =>
           url.toLowerCase().includes(normalizedExerciseName)
         );
+        console.log("matchedimage", matchedImage)
         return matchedImage;
       } else {
         return null;
@@ -194,18 +197,25 @@ const SpecificPart = () => {
   return (
     <Suspense fallback={<LoadingGrid />}>
       <div className="grid bg-black grid-cols-1 gap-4 w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        {exercisesToRender.map((exercise, index) => (
-          <ExerciseCard
-            key={exercise.id || index}
-            exercise={exercise}
-            matchedImage={matchedImages[index]}
-            index={index}
-            onClick={() => handleExerciseClick(exercise)}
-          />
-        ))}
+        {exercisesToRender
+          .map((exercise, index) => ({
+            exercise,
+            matchedImage: matchedImages[index],
+          }))
+          .filter(({ matchedImage }) => matchedImage) // Filter out exercises without images
+          .map(({ exercise, matchedImage }, index) => (
+            <ExerciseCard
+              key={exercise.id || index}
+              exercise={exercise}
+              matchedImage={matchedImage}
+              index={index}
+              onClick={() => handleExerciseClick(exercise)}
+            />
+          ))}
       </div>
     </Suspense>
   );
+  
 };
 
 export default SpecificPart;
