@@ -157,26 +157,34 @@ const SpecificPart = () => {
   const matchedImages = useMemo(() => {
     const exercisesToMatch =
       filteredExercises.length > 0 ? filteredExercises : specificExercises;
-    return exercisesToMatch.map((exercise, index) => {
+  
+    return exercisesToMatch.map((exercise) => {
       const normalizedExerciseName = normalizeName(exercise.name);
       const filteredImageData = filteredImages.find(
         (item) =>
           normalizeName(item.bodyPart) === normalizeName(exercise.bodyPart)
       );
-      console.log(":normalizedExerciseName",normalizedExerciseName)
-
+  
+      console.log(":normalizedExerciseName", normalizedExerciseName);
+  
       if (filteredImageData) {
-        console.log("filteredImageData",filteredImageData)
-        const matchedImage = filteredImageData.imageUrl.find((url) =>
-          url.toLowerCase().includes(normalizedExerciseName)
-        );
-        console.log("matchedimage", matchedImage)
+        console.log("filteredImageData", filteredImageData);
+  
+        // Ensure exact match using word boundaries or stricter comparison
+        const matchedImage = filteredImageData.imageUrl.find((url) => {
+          const normalizedUrl = url.toLowerCase();
+          return normalizedUrl.includes(normalizedExerciseName) &&
+                 normalizedUrl.match(new RegExp(`\\b${normalizedExerciseName}\\b`));
+        });
+  
+        console.log("matchedimage", matchedImage);
         return matchedImage;
       } else {
         return null;
       }
     });
   }, [filteredExercises, specificExercises, filteredImages]);
+  
 
   const exercisesToRender =
     filteredExercises.length > 0 ? filteredExercises : specificExercises;
@@ -202,7 +210,10 @@ const SpecificPart = () => {
             exercise,
             matchedImage: matchedImages[index],
           }))
-          .filter(({ matchedImage }) => matchedImage) // Filter out exercises without images
+          .filter(({ matchedImage }) => {
+            console.log(`Matched image for exercise:`, matchedImage);
+            return matchedImage; // Filter out exercises without images
+          })
           .map(({ exercise, matchedImage }, index) => (
             <ExerciseCard
               key={exercise.id || index}
@@ -214,8 +225,8 @@ const SpecificPart = () => {
           ))}
       </div>
     </Suspense>
-  );
   
+  );
 };
 
 export default SpecificPart;
