@@ -32,7 +32,7 @@ export default function Timer({ resetTimer }) {
 
   useEffect(() => {
     if (resetTimer) resetTimerState();
-  }, [resetTimer]);
+  }, [resetTimer, resetTimerState]);
 
   const resetTimerState = useCallback(() => {
     setState((prev) => ({
@@ -61,9 +61,9 @@ export default function Timer({ resetTimer }) {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [state.isRunning, state.currentSet, workoutComplete]);
+  }, [state.isRunning, state.currentSet, workoutComplete, handleSetCompletion]);
 
-  const handleSetCompletion = (prevState) => {
+  const handleSetCompletion = useCallback((prevState) => {
     if (prevState.isResting && prevState.currentSet < totalSets) {
       speakText(`Set ${prevState.currentSet} completed. Starting next set.`);
       setState((prev) => ({
@@ -80,7 +80,7 @@ export default function Timer({ resetTimer }) {
       speakText("Workout complete.");
       setWorkoutComplete(true);
     }
-  };
+  }, [setWorkoutComplete]);
 
   useEffect(() => {
     if (state.isRunning && !state.isResting && state.currentSet <= totalSets) {

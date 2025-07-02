@@ -5,7 +5,8 @@ import { normalizeBodyPartName } from "@/utils/api-client";
 
 const useImageMap = (name) => {
   const [imageMap, setImageMap] = useState({});
-  const images = useAppStore((state) => state.images) || [];
+  const rawImages = useAppStore((state) => state.images) || [];
+  const images = useMemo(() => rawImages, [rawImages]);
   const setFilteredImages = useAppStore((state) => state.setFilteredImages);
 
   const decodedName = useMemo(() => {
@@ -18,14 +19,15 @@ const useImageMap = (name) => {
 
   const normalizedInputName = useMemo(() => {
     return normalizeBodyPartName(decodedName);
-  }, [decodedName, name]);
+  }, [decodedName]);
 
   const filteredImages = useMemo(() => {
+    const imgs = images;
     if (!normalizedInputName) {
-      const overview = images.find(img => normalizeBodyPartName(img.bodyPart) === 'bodyparts');
+      const overview = imgs.find(img => normalizeBodyPartName(img.bodyPart) === 'bodyparts');
       return overview ? [overview] : [];
     }
-    return images.filter((image) => {
+    return imgs.filter((image) => {
       const bodyPartNormalized = normalizeBodyPartName(image.bodyPart);
       return bodyPartNormalized === normalizedInputName;
     });
@@ -56,7 +58,7 @@ const useImageMap = (name) => {
 
     debouncedUpdate();
     return () => debouncedUpdate.cancel();
-  }, [filteredImages, createImageMap, setFilteredImages, normalizedInputName]);
+  }, [filteredImages, createImageMap, setFilteredImages, images, normalizedInputName]);
 
   return imageMap;
 };

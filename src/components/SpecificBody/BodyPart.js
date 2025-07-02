@@ -162,7 +162,7 @@ const SpecificPart = () => {
     if (imagesForBodyPart.length > 0) {
       setFilteredImages(imagesForBodyPart);
     }
-  }, [imagesForBodyPart, setFilteredImages, imageMap, normalizedBodyPart]);
+  }, [setFilteredImages, imageMap, normalizedBodyPart]);
 
   const normalizeName = (name) =>
     name.toLowerCase().replace(/\s+/g, "").replace(/[^a-z0-9]/g, "");
@@ -207,14 +207,14 @@ const SpecificPart = () => {
     return exercisesToMatch
       .map((exercise) => {
         const exerciseName = normalizeBodyPartName(exercise.name).replace(/\s/g, "");
-        const matchedImage = exerciseImages.find((url) => {
+        const matchedImage = imageMap[normalizedBodyPart]?.find((url) => {
           const imageName = url.split('/').pop().replace('.webp', '');
           return normalizeBodyPartName(imageName).replace(/\s/g, "") === exerciseName;
         });
         return matchedImage ? { ...exercise, matchedImage } : null;
       })
       .filter(Boolean);
-  }, [filteredExercises, exercisesData, exerciseImages]);
+  }, [filteredExercises, exercisesData, imageMap, normalizedBodyPart]);
 
   if (isLoading || loading.specificExercises) {
     return <LoadingGrid />;
