@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { useSelector, useDispatch } from "react-redux";
 import {
   Card,
   CardHeader,
@@ -11,14 +10,13 @@ import {
   AccordionItem,
 } from "@nextui-org/react";
 import dynamic from "next/dynamic";
-import { setSpecificExercise } from "@/STORE/specificExerciseSlice";
 import { getvideoForCategory, getvideoManifest } from "@/utils/videoLoader";
-import { setSrc } from "@/STORE/mediaSlice";
 import { useWorkout } from "@/utils/WorkoutContext";
 import { YouTubeEmbed } from "@next/third-parties/google";
 import { faDumbbell, faBullseye } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { FaHandsHelping } from "react-icons/fa"; 
+import { FaHandsHelping } from "react-icons/fa";
+import { useAppStore } from "@/STORE/zustand-store";
 
 // Skeleton Loader Component
 const ExerciseSkeleton = () => {
@@ -118,12 +116,26 @@ const SpecificExercise = React.memo(() => {
   const [resetTimer, setResetTimer] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
-  
   const { workoutComplete, setWorkoutComplete } = useWorkout();
-  const dispatch = useDispatch();
-  const specificExercisesData = useSelector((state) => state.specificBody.specificExercises);
-  const specificsrc = useSelector((state) => state.media.src);
-  const specificExercise = useSelector((state) => state.specificExercise.specificExercise);
+  // Zustand state
+  const { specificExercises, setSpecificExercise, setSrc, src } = useAppStore();
+  const specificExercise = specificExercises[currentIndex] || null;
+  const specificsrc = src || "";
+
+  const extractVideoId = (url) => {
+    if (typeof url !== 'string') {
+      console.warn('URL is not a valid string:', url);
+      return null;
+    }
+    const regex = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    const match = url.match(regex);
+    return match && match[7] && match[7].length === 11 ? match[7] : null;
+  };
+
+  // Debug logging
+  console.log('🎬 SpecificWorkout - Video URL from Zustand:', specificsrc);
+  console.log('🎬 SpecificWorkout - Current exercise:', specificExercise?.name);
+  console.log('🎬 SpecificWorkout - Video ID extracted:', extractVideoId(specificsrc));
 
   const exerciseDetails = useMemo(() => {
     if (!specificExercise) return [];
@@ -154,21 +166,18 @@ const SpecificExercise = React.memo(() => {
     async (indexChange) => {
       setIsLoading(true);
       const newIndex = currentIndex + indexChange;
-      
-      if (newIndex >= 0 && newIndex < specificExercisesData.length) {
+      if (newIndex >= 0 && newIndex < specificExercises.length) {
         try {
           setCurrentIndex(newIndex);
-          const exercise = specificExercisesData[newIndex];
-          dispatch(setSpecificExercise(exercise));
-
+          const exercise = specificExercises[newIndex];
+          setSpecificExercise(exercise);
           const manifest = await getvideoManifest();
           const name = normalizeName(exercise.name);
           const videoSrc = getvideoForCategory(manifest, name);
-          dispatch(setSrc(videoSrc));
-
+          setSrc(videoSrc);
           setResetTimer(true);
           setTimeout(() => setResetTimer(false), 100);
-          setWorkoutComplete(newIndex === specificExercisesData.length - 1);
+          setWorkoutComplete(newIndex === specificExercises.length - 1);
         } catch (error) {
           console.error("Error changing exercise:", error);
         } finally {
@@ -176,20 +185,8 @@ const SpecificExercise = React.memo(() => {
         }
       }
     },
-    [currentIndex, dispatch, specificExercisesData, setWorkoutComplete, normalizeName]
+    [currentIndex, setSpecificExercise, setSrc, setWorkoutComplete, specificExercises, normalizeName]
   );
-
-  const extractVideoId = (url) => {
-    if (typeof url !== 'string') {
-      console.warn('URL is not a valid string:', url);
-      return null;
-    }
-  
-    const regex = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-    const match = url.match(regex);
-    
-    return match && match[7] && match[7].length === 11 ? match[7] : null;
-  };
 
   useEffect(() => {
     return () => {

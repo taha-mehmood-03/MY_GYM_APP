@@ -1,46 +1,54 @@
-import React, { useState, useMemo, useCallback, Suspense } from "react";
-import dynamic from "next/dynamic";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState, useMemo, useCallback, Suspense, startTransition } from "react";
 import Router from "next/router";
 import debounce from "lodash.debounce";
 import { Card, CardFooter, Button } from "@nextui-org/react";
 import Image from "next/image";
-import useFetchImages from "@/hooks/useFetchImages";
-import useFetchExercises from "@/hooks/useFetchExercises";
+import { useImages, useExercises, useSpecificExercises } from "@/hooks/useOptimizedQueries";
+import { useAppStore } from "@/STORE/zustand-store";
 import useImageMap from "@/hooks/useImageMap";
-import { fetchExercises } from "@/STORE/exerciseSlice";
-import { setExercises } from "@/STORE/specificBodySlice";
 import CardSkeleton from "../SKELETON/CardSkeleton";
-
-// Dynamic imports for better performance
-const DynamicCard = dynamic(
-  () => import("@nextui-org/react").then((mod) => mod.Card),
-  {
-    loading: () => <CardSkeleton />,
-    ssr: true,
-  }
-);
+import ClientOnly from "../ClientOnly";
+import { normalizeBodyPartName } from "@/utils/api-client";
 
 const LoadingGrid = ({ count = 6 }) => (
   <div className="grid grid-cols-1 gap-6 w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
     {Array.from({ length: count }, (_, index) => (
-      <CardSkeleton key={index} />
+      <div key={index} className="bg-gradient-to-br from-indigo-900 to-violet-900 p-6 rounded-lg shadow-md w-full border animate-pulse">
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center space-x-4">
+            <div className="relative w-20 h-20 lg:w-24 lg:h-24 rounded-full border-4 border-indigo-700 overflow-hidden mb-4 xs:mb-0 bg-indigo-700"></div>
+            <div className="flex flex-col">
+              <span className="bg-indigo-700 rounded w-32 h-5 block mb-2"></span>
+              <span className="bg-indigo-700 rounded w-48 h-5 block"></span>
+            </div>
+          </div>
+          <div className="bg-indigo-700 rounded-full w-10 h-10"></div>
+        </div>
+      </div>
     ))}
   </div>
 );
 
-const ExerciseCard = ({ exercise, index, imageSrc, handleExercise }) => {
+const ExerciseCard = React.memo(({ exercise, index, imageSrc, handleExercise }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseEnter = useCallback(() => setIsHovered(true), []);
+  const handleMouseLeave = useCallback(() => setIsHovered(false), []);
+  const handleImageLoad = useCallback(() => setImageLoaded(true), []);
+  const handleImageError = useCallback((e) => {
+    console.error(`Image loading error for ${exercise}:`, imageSrc, e);
+    e.target.onerror = null;
+  }, [exercise, imageSrc]);
 
   return (
     <div
       key={exercise.id || index}
       className="flex justify-center w-full"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      <DynamicCard className="group w-full max-w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl overflow-hidden transform transition-all duration-300 hover:scale-[1.02]">
+      <Card className="group w-full max-w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl overflow-hidden transform transition-all duration-300 hover:scale-[1.02]">
         <div className="relative w-full bg-gradient-to-br from-indigo-900 to-violet-900 p-1 rounded-xl">
           <div className="relative w-full rounded-lg overflow-hidden">
             {!imageLoaded && (
@@ -49,20 +57,17 @@ const ExerciseCard = ({ exercise, index, imageSrc, handleExercise }) => {
               </div>
             )}
             <Image
-              alt="Exercise image"
+              alt={`${exercise} exercise image`}
               className={`z-0 object-cover w-full transition-all duration-700 ${
                 imageLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95"
               } ${isHovered ? "transform scale-105" : ""}`}
               src={imageSrc}
               width={800}
               height={600}
-              loading={index < 3 ? "eager" : "lazy"}
               priority={index < 3}
-              onLoad={() => setImageLoaded(true)}
-              onError={(e) => {
-                console.error("Image loading error:", e);
-                e.target.onerror = null;
-              }}
+              loading={index < 3 ? undefined : "lazy"}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>
@@ -86,64 +91,66 @@ const ExerciseCard = ({ exercise, index, imageSrc, handleExercise }) => {
             </Button>
           </CardFooter>
         </div>
-      </DynamicCard>
+      </Card>
     </div>
   );
-};
+});
 
 const BodyPartLists = ({ initialImages, initialExercises }) => {
-  const dispatch = useDispatch();
-  const [exerciseName, setExerciseName] = useState("bodyparts");
-
+  const { setSpecificExercises, setSelectedBodyPart } = useAppStore();
+  const [selectedBodyPart, setSelectedBodyPartLocal] = useState(null);
+  
+  // Use optimized hooks for data fetching
   const {
     data: images,
-    status: imageStatus,
-    error: imageError,
-  } = useFetchImages(initialImages);
+    isLoading: imagesLoading,
+    error: imagesError,
+  } = useImages(initialImages);
+  
   const {
     data: exercises,
-    status: exerciseStatus,
-    error: exerciseError,
-  } = useFetchExercises(
-    "https://exercisedb.p.rapidapi.com/exercises/bodyPartList",
-    "exercise",
-    initialExercises
-  );
-  const imageMap = useImageMap(exerciseName);
-  const memoizedExercises = useMemo(() => exercises || [], [exercises]);
+    isLoading: exercisesLoading,
+    error: exercisesError,
+  } = useExercises(initialExercises);
+  
+  // Always call useImageMap (fix conditional hook)
+  const imageMap = useImageMap(selectedBodyPart, images);
+
+  // Get body part images for the main page (when no specific body part is selected)
+  const bodyPartImages = useMemo(() => {
+    if (!images || images.length === 0) return [];
+    // Find the "bodyparts" entry which contains the main body part images
+    const bodyPartsEntry = images.find(img => img.bodyPart === 'bodyparts');
+    return bodyPartsEntry?.imageUrl || [];
+  }, [images]);
+
+  const memoizedExercises = useMemo(() => {
+    return exercises || [];
+  }, [exercises]);
 
   const handleExercise = useCallback(
-    debounce((name) => {
+    (name) => {
       if (!name || typeof name !== "string") {
-        console.error("Invalid exercise name:", name);
         return;
       }
-      const formattedName = encodeURIComponent(name.trim().toLowerCase());
-      setExerciseName(formattedName);
-
-      const apiEndpoint = `https://exercisedb.p.rapidapi.com/exercises/bodyPart/${formattedName}?limit=1000&offset=0`;
-
-      dispatch(fetchExercises({ endpoint: apiEndpoint, slice: "specificBody" }))
-        .then((response) => {
-          const exercises = response.payload.data;
-          dispatch(setExercises(exercises));
-          Router.push("/SpecificPart");
-        })
-        .catch((error) => {
-          console.error("Error fetching exercises:", error);
-        });
-    }, 500),
-    [dispatch]
+      
+      startTransition(() => {
+        // Map the exercise name to the correct API body part name
+        const bodyPartName = normalizeBodyPartName(name.trim());
+        setSelectedBodyPartLocal(bodyPartName);
+        setSelectedBodyPart(bodyPartName); // Set in store
+        Router.push("/SpecificPart");
+      });
+    },
+    [setSelectedBodyPart]
   );
 
   const renderExerciseList = useMemo(() => {
     return memoizedExercises.map((exercise, index) => {
-      const bodypartsArray = imageMap?.bodyparts || [];
       const imageSrc =
-        bodypartsArray.length > 0
-          ? bodypartsArray[index % bodypartsArray.length]
-          : "/default-bodypart-image.jpg";
-
+        bodyPartImages.length > 0
+          ? bodyPartImages[index % bodyPartImages.length]
+          : "/imagesofbodyparts/imagesofbodyParts/back.webp";
       return (
         <ExerciseCard
           key={exercise.id || index}
@@ -154,27 +161,27 @@ const BodyPartLists = ({ initialImages, initialExercises }) => {
         />
       );
     });
-  }, [memoizedExercises, imageMap, handleExercise]);
+  }, [memoizedExercises, bodyPartImages, handleExercise]);
 
-  if (exerciseStatus === "loading" || imageStatus === "loading") {
+  if (exercisesLoading || imagesLoading) {
     return <LoadingGrid />;
   }
 
-  // if (exerciseError || imageError) {
-  //   return (
-  //     <div className="text-center text-red-500 p-4">
-  //       Error loading content. Please try again.
-  //     </div>
-  //   );
-  // }
+  if (exercisesError || imagesError) {
+    return (
+      <div className="text-center text-red-500 p-4">
+        Error loading content. Please try again.
+      </div>
+    );
+  }
 
   return (
-    <Suspense fallback={<LoadingGrid />}>
+    <ClientOnly fallback={<LoadingGrid />}>
       <div className="grid bg-black grid-cols-1 gap-4 w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {renderExerciseList}
       </div>
-    </Suspense>
+    </ClientOnly>
   );
 };
 
-export default BodyPartLists;
+export default React.memo(BodyPartLists);

@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { fetchCalories } from '@/STORE/caloriesSlice'; // Adjust the path accordingly
+import { useCalculateCalories } from '@/hooks/useOptimizedQueries';
 
 const useFormCal = () => {
   const [formData, setFormData] = useState({
@@ -11,7 +10,7 @@ const useFormCal = () => {
     weight: '',
   });
 
-  const dispatch = useDispatch();
+  const calculateCaloriesMutation = useCalculateCalories();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -24,15 +23,16 @@ const useFormCal = () => {
   const handleSelectChange = (value, name) => {
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,  // Ensure `value` is the correct type
+      [name]: value,
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Log formData to verify the values
     console.log("Form Data:", formData);
-    dispatch(fetchCalories(formData));
+    
+    // Use the optimized calories calculation mutation
+    calculateCaloriesMutation.mutate(formData);
   };
 
   return {
@@ -40,6 +40,8 @@ const useFormCal = () => {
     handleInputChange,
     handleSelectChange,
     handleSubmit,
+    isLoading: calculateCaloriesMutation.isPending,
+    error: calculateCaloriesMutation.error,
   };
 };
 

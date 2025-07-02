@@ -2,7 +2,7 @@ import React, { Suspense, lazy } from "react";
 import { WorkoutProvider } from "@/utils/WorkoutContext";
 
 // Lazy load the SpecificExercise component
-const SpecificExercise = lazy(() => import("@/src/components/SpecificExercise/SpecificExercise"));
+const SpecificExercise = lazy(() => import("@/components/SpecificExercise/SpecificExercise"));
 
 export default function Specificworkout() {
     return (

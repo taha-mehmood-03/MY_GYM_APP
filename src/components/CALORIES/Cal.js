@@ -1,12 +1,12 @@
 import React from "react";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Spinner } from "@nextui-org/react";
-import { useSelector } from 'react-redux';
+import { useAppStore } from '@/STORE/zustand-store';
 
 export default function Cal() {
-  const { caloriesData, status, error } = useSelector((state) => state.calories);
+  const { caloriesData, loading, errors } = useAppStore();
 
-  if (status === 'loading') return <Spinner label="Loading..." />;
-  if (status === 'failed') return <div className="text-red-500 font-semibold">Error: {error}</div>;
+  if (loading.calories) return <Spinner label="Loading..." />;
+  if (errors.calories) return <div className="text-red-500 font-semibold">Error: {errors.calories}</div>;
 
   return (
     <div className="container mx-auto p-8 min-h-screen bg-gradient-to-br from-purple-900 to-indigo-900 text-white">

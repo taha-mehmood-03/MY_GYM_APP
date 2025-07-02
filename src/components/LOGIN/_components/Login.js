@@ -1,7 +1,7 @@
 import { Input, Button } from '@nextui-org/react';
 import Link from 'next/link';
 import useSignupForm from '@/hooks/useSignupForm';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 function Login() {
@@ -102,7 +102,7 @@ function Login() {
           Sign In
         </Button>
         <p className="text-white mt-4">
-          Don’t have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link href="/" className="text-indigo-400 hover:text-indigo-500">
             Sign up
           </Link>

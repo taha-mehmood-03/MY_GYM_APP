@@ -17,26 +17,17 @@ import {
 } from "@nextui-org/react";
 import useInputValue from "@/hooks/useInputValue";
 import { SearchIcon } from "./SearchIcon";
-import { useSelector, useDispatch } from "react-redux";
-import { setImages, clearSearch, searchExercises } from "@/STORE/specificBodySlice";
 import { getImageManifest } from "@/utils/imageLoader";
 import { useRouter } from "next/router";
+import { useAppStore } from "@/STORE/zustand-store";
 
 export default function NavTwo() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const searchInput = useInputValue("");
-  const dispatch = useDispatch();
   const router = useRouter();
-
   const [imagesMap, setImagesMap] = useState({});
-  
-  const specificExercisesData = useSelector(
-    (state) => state.specificBody.specificExercises
-  );
-  const specificExerciseImages = useSelector(
-    (state) => state.specificBody.images
-  );
-  const specificBody = useSelector((state) => state.specificBody); 
+  const { specificExercises, setSpecificExercises } = useAppStore();
+
   const normalizeName = (name) =>
     name.toLowerCase().replace(/\s+/g, "").replace(/\//g, "");
 
@@ -45,7 +36,6 @@ export default function NavTwo() {
       const manifest = await getImageManifest();
       setImagesMap(manifest);
     }
-
     initialize();
   }, []);
 
@@ -53,7 +43,7 @@ export default function NavTwo() {
     const searchTerm = searchInput.value.trim().toLowerCase();
   
     if (searchTerm) {
-      const filteredExercises = specificExercisesData.filter((exercise) =>
+      const filteredExercises = specificExercises.filter((exercise) =>
         exercise.name.toLowerCase().includes(searchTerm)
       );
 
@@ -69,10 +59,7 @@ export default function NavTwo() {
         ),
       }));
 
-      dispatch(searchExercises(combinedFilteredData));
-    } else {
-      dispatch(clearSearch());
-      dispatch(setImages(specificExerciseImages));
+      setSpecificExercises(combinedFilteredData);
     }
   };
 

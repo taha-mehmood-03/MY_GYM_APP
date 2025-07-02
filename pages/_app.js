@@ -1,14 +1,7 @@
-import { PersistGate } from 'redux-persist/integration/react';
-import { Provider } from 'react-redux';
 import { NextUIProvider } from '@nextui-org/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import RootLayout from '@/app/layout';
-import { store, persistor } from '@/STORE/store';
-import '../src/app/globals.css';
+import '@/app/globals.css';
 import axios from 'axios';
-
-// Configure Axios defaults
-
 
 // Axios interceptors for request and response
 axios.interceptors.request.use(
@@ -32,11 +25,16 @@ axios.interceptors.response.use(
   }
 );
 
-// Create a Query Client instance
+// Create a Query Client instance with optimized settings
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
+      retry: 2,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
+    },
+    mutations: {
       retry: 1,
     },
   },
@@ -44,18 +42,11 @@ const queryClient = new QueryClient({
 
 function MyApp({ Component, pageProps }) {
   return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <QueryClientProvider client={queryClient}>
-        
-          <NextUIProvider>
-            <RootLayout>
-              <Component {...pageProps} />
-            </RootLayout>
-          </NextUIProvider>
-        </QueryClientProvider>
-      </PersistGate>
-    </Provider>
+    <QueryClientProvider client={queryClient}>
+      <NextUIProvider>
+        <Component {...pageProps} />
+      </NextUIProvider>
+    </QueryClientProvider>
   );
 }
 

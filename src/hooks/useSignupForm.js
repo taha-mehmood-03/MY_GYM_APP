@@ -49,7 +49,7 @@ const useSignupForm = () => {
       setMessage(data.message || 'Registration successful!');
       
       // Redirect user to login page
-      router.push('/Tologin');
+      router.push('/ToLogin');
     } catch (error) {
       console.error('Error during registration:', error);
       setMessage('An error occurred. Please try again later.');
