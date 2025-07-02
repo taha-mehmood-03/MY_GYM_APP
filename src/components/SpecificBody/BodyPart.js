@@ -118,6 +118,8 @@ const ExerciseCard = React.memo(({ exercise, matchedImage, index, onClick }) => 
   );
 });
 
+ExerciseCard.displayName = "ExerciseCard";
+
 // Main component to render all exercises
 const SpecificPart = () => {
   const router = useRouter();
@@ -151,20 +153,16 @@ const SpecificPart = () => {
   // Use the mapped/normalized value for API calls
   const apiBodyPart = normalizeBodyPartName(selectedBodyPart);
   const { data: specificExercisesData, isLoading, error } = useSpecificExercises(apiBodyPart, !!apiBodyPart);
-  const exercisesData = specificExercisesData || specificExercises || [];
+  const exercisesData = useMemo(() => specificExercisesData || specificExercises || [], [specificExercisesData, specificExercises]);
   const imageMap = useImageMap(apiBodyPart);
   const normalizedBodyPart = apiBodyPart?.trim().toLowerCase().replace(/\s+/g, "");
-  const imagesForBodyPart = imageMap[normalizedBodyPart] || [];
 
-  // Get the correct image list for the current body part
-  const manifestKey = normalizeBodyPartName(apiBodyPart).replace(/\s/g, "");
-  const exerciseImages = imageManifest[manifestKey] || [];
-
-  React.useEffect(() => {
+  useEffect(() => {
+    const imagesForBodyPart = imageMap[normalizedBodyPart] || [];
     if (imagesForBodyPart.length > 0) {
       setFilteredImages(imagesForBodyPart);
     }
-  }, [imagesForBodyPart, setFilteredImages]);
+  }, [imagesForBodyPart, setFilteredImages, imageMap, normalizedBodyPart]);
 
   const normalizeName = (name) =>
     name.toLowerCase().replace(/\s+/g, "").replace(/[^a-z0-9]/g, "");

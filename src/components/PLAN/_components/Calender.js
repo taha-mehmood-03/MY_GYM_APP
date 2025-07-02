@@ -14,7 +14,7 @@ const Calendar = React.memo(
   ({ currentDate, handleDateClick, handlePreviousMonth, handleNextMonth }) => {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
-    const today = new Date();
+    const today = useMemo(() => new Date(), []);
 
     const isCurrentMonth = useMemo(
       () => isSameMonth(currentDate, today),

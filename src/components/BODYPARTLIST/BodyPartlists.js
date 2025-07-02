@@ -96,6 +96,8 @@ const ExerciseCard = React.memo(({ exercise, index, imageSrc, handleExercise }) 
   );
 });
 
+ExerciseCard.displayName = "ExerciseCard";
+
 const BodyPartLists = ({ initialImages, initialExercises }) => {
   const { setSpecificExercises, setSelectedBodyPart } = useAppStore();
   const [selectedBodyPart, setSelectedBodyPartLocal] = useState(null);

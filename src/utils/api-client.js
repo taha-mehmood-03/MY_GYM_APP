@@ -155,8 +155,11 @@ export const normalizeBodyPartName = (bodyPart) => {
   return mapping[bodyPart.trim().toLowerCase()] || bodyPart.trim().toLowerCase();
 };
 
-export default {
-  exercise: exerciseApiClient,
-  nutrition: nutritionApiClient,
-  internal: internalApiClient,
-}; 
+// At the end of the file, before export default
+const apiClients = {
+  exerciseApi,
+  nutritionApi,
+  internalApi,
+};
+
+export default apiClients; 
